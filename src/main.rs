@@ -13,9 +13,9 @@ fn main() {
         })
     };
 
-    let mut functions = vec![];
-    let mut variables = vec![];
-    let mut constants = vec![];
+    let mut functions = HashMap::new();
+    let mut variables = HashMap::new();
+    let mut constants = HashMap::new();
 
     for top_level in xml.descendants() {
         match top_level.tag_name().name() {
@@ -35,14 +35,14 @@ fn main() {
                     }
 
                     if sub_field.has_tag_name("Parameter") {
-                        let parameter_name = sub_field.attribute("Name").unwrap().to_owned();
+                        let name = sub_field.attribute("Name").unwrap().to_owned();
                         let gm_type = sub_field.attribute("Type").unwrap().to_owned();
                         let optional: bool =
                             sub_field.attribute("Optional").unwrap().parse().unwrap();
                         let description = sub_field.text().unwrap_or_default().to_owned();
 
                         parameters.push(Parameter {
-                            parameter_name: parameter_name.to_string(),
+                            name: name.to_string(),
                             description,
                             gm_type,
                             optional,
@@ -52,15 +52,18 @@ fn main() {
 
                 let link = make_link(&name);
 
-                functions.push(Function {
-                    name,
-                    parameters,
-                    description: description.unwrap_or_default().to_owned(),
-                    deprecated,
-                    returns,
-                    pure,
-                    link,
-                });
+                functions.insert(
+                    name.clone(),
+                    Function {
+                        name,
+                        parameters,
+                        description: description.unwrap_or_default().to_owned(),
+                        deprecated,
+                        returns,
+                        pure,
+                        link,
+                    },
+                );
             }
 
             "Variable" => {
@@ -74,16 +77,19 @@ fn main() {
 
                 let link = make_link(&name);
 
-                variables.push(Variable {
-                    name,
-                    description,
-                    returns: gm_type,
-                    link,
-                    deprecated,
-                    get,
-                    set,
-                    instance,
-                });
+                variables.insert(
+                    name.clone(),
+                    Variable {
+                        name,
+                        description,
+                        returns: gm_type,
+                        link,
+                        deprecated,
+                        get,
+                        set,
+                        instance,
+                    },
+                );
             }
             "Constant" => {
                 let name = top_level.attribute("Name").unwrap().to_string();
@@ -100,14 +106,17 @@ fn main() {
 
                 let link = make_link(&name);
 
-                constants.push(Constant {
-                    name,
-                    description,
-                    class,
-                    deprecated,
-                    link,
-                    returns: gm_type,
-                })
+                constants.insert(
+                    name.clone(),
+                    Constant {
+                        name,
+                        description,
+                        class,
+                        deprecated,
+                        link,
+                        returns: gm_type,
+                    },
+                );
             }
             "Structures" | "Enumerations" => {
                 // we're going to ignore these for now!

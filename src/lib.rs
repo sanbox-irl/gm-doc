@@ -1,14 +1,16 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 use url::Url;
 
-#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Program {
     /// All the functions in the manual.
-    pub functions: Vec<Function>,
+    pub functions: HashMap<String, Function>,
     /// All the variables in the manual.
-    pub variables: Vec<Variable>,
+    pub variables: HashMap<String, Variable>,
     /// All the constants in the manual.
-    pub constants: Vec<Constant>,
+    pub constants: HashMap<String, Constant>,
 }
 
 /// A function.
@@ -70,7 +72,7 @@ pub struct Variable {
 #[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, Default, Serialize, Deserialize)]
 pub struct Parameter {
     /// The name of the parameter.
-    pub parameter_name: String,
+    pub name: String,
 
     /// A description given of the parameter.
     pub description: String,
