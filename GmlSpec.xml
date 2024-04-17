@@ -9,7 +9,7 @@
 		<Function Name="animcurve_channel_new" Deprecated="false" ReturnType="Struct.AnimCurveChannel" Pure="true">
 			<Description>This function creates a new animation curve channel struct.</Description>
 		</Function>
-		<Function Name="animcurve_create" Deprecated="false" ReturnType="Struct.AnimCurve" Pure="true">
+		<Function Name="animcurve_create" Deprecated="false" ReturnType="Struct.AnimCurve" Pure="false">
 			<Description>This function creates an empty animation curve struct, ready for you to populate with channel data.</Description>
 		</Function>
 		<Function Name="animcurve_destroy" Deprecated="false" ReturnType="Undefined" Pure="false">
@@ -104,7 +104,7 @@
 			<Description>With this function you can set how many audio channels are available for playing audio in GameMaker. What this basically means is that you give the number of simultaneous sounds that can be played at any one time, and if the number exceeds the amount, those sounds with a lower priority are stopped to free up a channel for the sounds with a higher priority. You can use this function to optimise your game for devices as the lower the number of channels for audio the better the performance, but bear in mind that this may also cause noticeable cut off of certain sounds if many are played at once.</Description>
 			<Parameter Name="num" Type="Real" Optional="false">Number of available audio channels (default is 128).</Parameter>
 		</Function>
-		<Function Name="audio_create_stream" Deprecated="false" ReturnType="Asset.GMSound" Pure="true">
+		<Function Name="audio_create_stream" Deprecated="false" ReturnType="Asset.GMSound" Pure="false">
 			<Description>With this function you can create a new sound index which can then be used in the regular audio functions to stream audio directly from an external OGG file source. The function requires the filename (which can be an included file, for example) and will return the new sound index for use. Note that after you no longer need the sound you should call the function audio_destroy_stream() with the sound index to remove it from memory otherwise you may get a memory leak which will slow down and eventually crash your game.</Description>
 			<Parameter Name="filename" Type="String" Optional="false">The file (OGG only) to stream the audio from.</Parameter>
 		</Function>
@@ -112,9 +112,9 @@
 			<Description>This function can be used to display debug information about the audio system, with true switching it on and false to switch it off. When you are debugging audio in this way, the overlay will show the following information:</Description>
 			<Parameter Name="enable" Type="Bool" Optional="false">Enable (set to true) or disable (false) audio debugging.</Parameter>
 		</Function>
-		<Function Name="audio_destroy_stream" Deprecated="false" ReturnType="Undefined" Pure="false">
-			<Description>If you have previously created an audio stream from a file using the function audio_create_stream() and no longer need that sound, you can call this function to delete it from memory. Any further calls to the sound index after it has been destroyed will give an error. It should be noted that this will free up the stream but on the target platform this may not show up in a memory manager. This is because GameMaker pools memory resources to prevent memory allocation overhead, and so the memory will remain allocated until required for something else or re-used for a new stream.</Description>
-			<Parameter Name="filename" Type="String" Optional="false">The file to stream the audio from.</Parameter>
+		<Function Name="audio_destroy_stream" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>If you have previously created an audio stream from a file using the function audio_create_stream() and no longer need that sound, you can call this function to delete it from memory. The function returns 1 if the stream was successfully destroyed and -1 if it wasn't. Any further calls to the sound index after it has been destroyed will give an error. It should be noted that this will free up the stream but on the target platform this may not show up in a memory manager. This is because GameMaker pools memory resources to prevent memory allocation overhead, and so the memory will remain allocated until required for something else or re-used for a new stream.</Description>
+			<Parameter Name="sound" Type="Asset.GMSound" Optional="false">The sound asset, as returned by audio_create_stream.</Parameter>
 		</Function>
 		<Function Name="audio_exists" Deprecated="false" ReturnType="Bool" Pure="true">
 			<Description>This function returns whether a sound exists (true) or not (false). Note that if the index you search for has not been initialised previously, this function will cause an error as it is searching for non-existent asset indices. The sound to check can either be a single instance of a sound (the index for individual sounds being played can be stored in a variable when using the audio_play_sound() or audio_play_sound_at() functions) or a sound asset.</Description>
@@ -282,7 +282,7 @@
 		<Function Name="audio_system_is_initialised" Deprecated="false" ReturnType="Bool" Pure="true">
 			<Description>This function can be used to check if the audio engine has been initialised, after which all audio functions can be called normally. For all targets other than HTML5, this will return true on Game Start. On HTML5, this may only begin to return true after Game Start. While audio_system_is_available() reflects the ability to play audio, this function reflects the ability to call audio functions more generally.</Description>
 		</Function>
-		<Function Name="audio_create_buffer_sound" Deprecated="false" ReturnType="Asset.GMSound" Pure="true">
+		<Function Name="audio_create_buffer_sound" Deprecated="false" ReturnType="Asset.GMSound" Pure="false">
 			<Description>With this function you can create a new sound from the contents of a buffer. The buffer will have been created previously (see the buffer functions for details on how to do this), and have had data added or loaded into it. You then pass it to this function with the data format (only buffer_u8 or buffer_s16 are currently supported), the sample rate (which can be between 1000hz and 48000hz), and an offset into the buffer to get the data from. You also need to supply the number of samples in the buffer and the channels that the sound requires. These channels are defined by one of the following constants:</Description>
 			<Parameter Name="bufferId" Type="Id.Buffer" Optional="false">The ID of the buffer to use.</Parameter>
 			<Parameter Name="bufferFormat" Type="Constant.BufferDataType" Optional="false">The format of the data in the buffer (buffer_u8 or buffer_s16).</Parameter>
@@ -291,7 +291,7 @@
 			<Parameter Name="bufferLength" Type="Real" Optional="false">The length of the buffer (the number of bytes of audio data, excluding the header).</Parameter>
 			<Parameter Name="bufferChannels" Type="Constant.AudioChannelType" Optional="false">The channels to use (audio_mono, audio_stereo or audio_3D).</Parameter>
 		</Function>
-		<Function Name="audio_create_play_queue" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="audio_create_play_queue" Deprecated="false" ReturnType="Real" Pure="false">
 			<Description>This function prepares a buffer queue for audio. You pass data format (only buffer_u8 or buffer_s16 are currently supported), the sample rate (which can be between 1000hz and 48000hz), and the channels that the audio requires from one of the constants listed below:</Description>
 			<Parameter Name="queueformat" Type="Constant.BufferDataType" Optional="false">The format of the buffer data to use (buffer_u8 or buffer_s16).</Parameter>
 			<Parameter Name="queuerate" Type="Real" Optional="false">The sample rate of the data in the buffer queue.</Parameter>
@@ -526,7 +526,7 @@
 			<Description>When using multiple listeners on a system, you can set the bit-mask for a sound and have it heard from the flagged listener only. However, you can also set the global mask using this function and all sounds played normally will be heard from the listeners flagged by this mask, without the need to set the mask for each sound individually.</Description>
 			<Parameter Name="mask" Type="String" Optional="false">The bit-mask data to set for the listeners</Parameter>
 		</Function>
-		<Function Name="audio_create_sync_group" Deprecated="false" ReturnType="Id.AudioSyncGroup" Pure="true">
+		<Function Name="audio_create_sync_group" Deprecated="false" ReturnType="Id.AudioSyncGroup" Pure="false">
 			<Description>Creates a sync group and returns a unique ID value for it which should then be used in all further audio function calls for this group. If you want the group to loop then pass in true, otherwise pass in false, but note that if you want them to loop, all the tracks added later need to be the same length. Note that when you create a sync group, you will need to free the memory and sounds associated with it when not in use using the audio_destroy_sync_group() function - for example, in the Room End or Destroy events.</Description>
 			<Parameter Name="loop" Type="Bool" Optional="false">Whether the tracks in the group should loop (true) or not (false).</Parameter>
 		</Function>
@@ -571,10 +571,10 @@
 			<Description>This function can be used to check if any audio in a synchronised group is paused. You are required to supply the sync group ID as returned by the function audio_create_sync_group().</Description>
 			<Parameter Name="group_index" Type="Id.AudioSyncGroup" Optional="false">The group index to check.</Parameter>
 		</Function>
-		<Function Name="audio_bus_create" Deprecated="false" ReturnType="Struct.AudioBus" Pure="true">
+		<Function Name="audio_bus_create" Deprecated="false" ReturnType="Struct.AudioBus" Pure="false">
 			<Description>This function creates and returns a new audio bus struct, which can be modified to configure the bus' properties and to add audio effects to it.</Description>
 		</Function>
-		<Function Name="audio_effect_create" Deprecated="false" ReturnType="Struct.AudioEffect" Pure="true">
+		<Function Name="audio_effect_create" Deprecated="false" ReturnType="Struct.AudioEffect" Pure="false">
 			<Description>This function creates and returns a new audio effect struct, which can be modified to configure the effect's properties.</Description>
 			<Parameter Name="type" Type="Enum.AudioEffectType" Optional="false">The type of audio effect to create.</Parameter>
 			<Parameter Name="params" Type="Struct" Optional="true">A struct containing any initial values for the effect's parameters.</Parameter>
@@ -617,7 +617,7 @@
 			<Description>This function can be used to enable or disable anti-aliasing (AA) for fonts added using font_add(). This function needs to be called before you add any fonts and setting it to true will enable AA, and setting it to false will disable it. By default AA is enabled. Note that this will have no effect on fonts that have been added before the function was called, and the function only needs to be called once when the font is added, and not every draw/step that the font is being used.</Description>
 			<Parameter Name="enable" Type="Bool" Optional="false">Whether to enable (true) or disable (false) AA for added fonts.</Parameter>
 		</Function>
-		<Function Name="font_add_get_enable_aa" Deprecated="false" ReturnType="Bool" Pure="false">
+		<Function Name="font_add_get_enable_aa" Deprecated="false" ReturnType="Bool" Pure="true">
 			<Description>This function can be used to check whether anti-aliasing (AA) is enabled for fonts added using font_add(). The function will return true if AA is enabled, and false if it is not. Note that AA is enabled by default, but you can change the AA state for added fonts using the function font_add_enable_aa(), as long as it is called before adding the font.</Description>
 		</Function>
 		<Function Name="font_add_sprite" Deprecated="false" ReturnType="Asset.GMFont" Pure="false">
@@ -643,7 +643,7 @@
 			<Parameter Name="ind" Type="Asset.GMFont" Optional="false">The index of the font.</Parameter>
 			<Parameter Name="enable" Type="Bool" Optional="false">Whether to enable (true) or disable (false) SDF rendering for the specified font.</Parameter>
 		</Function>
-		<Function Name="font_get_sdf_enabled" Deprecated="false" ReturnType="Bool" Pure="false">
+		<Function Name="font_get_sdf_enabled" Deprecated="false" ReturnType="Bool" Pure="true">
 			<Description>With this function you can determine whether SDF rendering is enabled or disabled for the specified font</Description>
 			<Parameter Name="ind" Type="Asset.GMFont" Optional="false">The index of the font.</Parameter>			
 		</Function>
@@ -652,7 +652,7 @@
 			<Parameter Name="ind" Type="Asset.GMFont" Optional="false">The index of the font.</Parameter>
 			<Parameter Name="spread" Type="Real" Optional="false">The SDF spread value to set for the specified font.</Parameter>
 		</Function>
-		<Function Name="font_get_sdf_spread" Deprecated="false" ReturnType="Real" Pure="false">
+		<Function Name="font_get_sdf_spread" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>With this function you can query the SDF spread value for the specified font</Description>
 			<Parameter Name="ind" Type="Asset.GMFont" Optional="false">The index of the font.</Parameter>			
 		</Function>
@@ -737,7 +737,7 @@
 			<Parameter Name="obj" Type="Asset.GMObject" Optional="false">The new object the calling object will change into.</Parameter>
 			<Parameter Name="perf" Type="Bool" Optional="false">Whether to perform that new object&apos;s create and destroy events (true) or not (false).</Parameter>
 		</Function>
-		<Function Name="instance_copy" Deprecated="false" ReturnType="Id.Instance" Pure="true">
+		<Function Name="instance_copy" Deprecated="false" ReturnType="Id.Instance" Pure="false">
 			<Description>With this function you can &quot;clone&quot; an instance as this will create a new version of the instance running the code at its same position. The &quot;perf&quot; argument is used to instruct this new instance to perform the create event or not. This function returns the id of the new instance which can then be stored in a variable or used to access that instance.</Description>
 			<Parameter Name="perf" Type="Bool" Optional="false">Whether to perform the new instance&apos;s Create event (true) or not (false).</Parameter>
 		</Function>
@@ -931,7 +931,7 @@
 		<Function Name="event_perform" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function will perform the specified event, with the designated argument, for the instance running the code. There are many options here which allow complete simulation of all possible events, but note that this literally just performs all the code in the event and the game will not modify anything to make it trigger itself manually, for example if you choose to perform a keyboard press event, the event will be triggered but relevant key will not be recognised as having been pressed. Or if you perform an alarm event, the alarm counter will not be set to -1 but rather continue to count down.</Description>
 			<Parameter Name="type" Type="Constant.EventType" Optional="false">The type of event to perform (see the table above).</Parameter>
-			<Parameter Name="numb" Type="Constant.EventNumber,Real,Constant.VirtualKey" Optional="false">The specific event constant or value, if one is necessary (otherwise, just use 0).</Parameter>
+			<Parameter Name="numb" Type="Constant.EventNumber,Real,Constant.VirtualKey,Asset.GMObject" Optional="false">The specific event constant or value, if one is necessary (otherwise, just use 0).</Parameter>
 		</Function>
 		<Function Name="event_perform_async" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function is used to perform any one of the Asynchronous Events provided in GameMaker. You supply the Async event constant (shown in the table below) and a DS map which will be available in the called Async event in the async_load variable.</Description>
@@ -942,7 +942,7 @@
 			<Description>This functions works the same as event_perform() except that this time you can specify events from another object. There are many options here which allow complete simulation of all possible events, but note that this literally just performs all the code in the event and the game will not modify anything to make it trigger itself manually, for example if you choose to perform a keyboard press event, the event will be triggered but the relevant key will not be recognised as having been pressed. Or if you perform an alarm event, the alarm counter will not be set to -1 but rather continue to count down. You can find a complete list of the available constants this function requires from the the page for the function event_perform().</Description>
 			<Parameter Name="obj" Type="Any" Optional="false">The object that should have its event triggered.</Parameter>
 			<Parameter Name="type" Type="Constant.EventType" Optional="false">The type of event to perform.</Parameter>
-			<Parameter Name="numb" Type="Constant.EventNumber,Real,Constant.VirtualKey" Optional="false">The specific event, if one is necessary (otherwise, just use 0).</Parameter>
+			<Parameter Name="numb" Type="Constant.EventNumber,Real,Constant.VirtualKey,Asset.GMObject" Optional="false">The specific event, if one is necessary (otherwise, just use 0).</Parameter>
 		</Function>
 		<Function Name="event_user" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you tell the instance to run the actions or code that has been placed within one of the 16 user defined events. These events can only be called in this way, or using the event_perform function.</Description>
@@ -1230,7 +1230,7 @@
 			<Parameter Name="background_element_id" Type="Id.BackgroundElement" Optional="false">The unique ID value of the background element to change</Parameter>
 			<Parameter Name="blend" Type="Constant.Color" Optional="false">The colour to blend with the background sprite (default is c_white)</Parameter>
 		</Function>
-		<Function Name="layer_background_create" Deprecated="false" ReturnType="Id.BackgroundElement" Pure="true">
+		<Function Name="layer_background_create" Deprecated="false" ReturnType="Id.BackgroundElement" Pure="false">
 			<Description>With this function you can assign a sprite resource to a layer to be used as a background in your project. You supply the layer ID (which you get when you create the layer using layer_create()) or the layer name (as a string - this will have a performance impact) and a sprite index (which would be the name of the sprite as shown in the Asset Browser), and it will be added to the layer. The function returns the unique ID value for the element, which can then be used in further layer functions for backgrounds.</Description>
 			<Parameter Name="layer_id" Type="String,Id.Layer" Optional="false">The unique ID value of the layer to target (or the layer name as a string)</Parameter>
 			<Parameter Name="sprite" Type="Asset.GMSprite" Optional="false">The sprite index to be used</Parameter>
@@ -1635,7 +1635,7 @@
 			<Parameter Name="sprite_element_id" Type="Id.SpriteElement" Optional="false">The unique ID value of the sprite element to change</Parameter>
 			<Parameter Name="sprite_index" Type="Asset.GMSprite" Optional="false">The new sprite index to use</Parameter>
 		</Function>
-		<Function Name="layer_sprite_create" Deprecated="false" ReturnType="Id.SpriteElement" Pure="true">
+		<Function Name="layer_sprite_create" Deprecated="false" ReturnType="Id.SpriteElement" Pure="false">
 			<Description>With this function you can assign a sprite resource to a layer to be used in your project. You supply the layer ID (which you get when you create the layer using layer_create() or when you use the layer name along with layer_get_id()), a position within the room, and a sprite index (which would be the name of the sprite as shown in the Asset Browser), and it will be added to the layer. The function returns the unique ID value for the element, which can then be used in further layer functions for sprites.</Description>
 			<Parameter Name="layer_id" Type="String,Id.Layer" Optional="false">The unique ID value of the layer to target</Parameter>
 			<Parameter Name="x" Type="Real" Optional="false">The x position to use</Parameter>
@@ -1726,7 +1726,7 @@
 			<Parameter Name="sprite_element_id" Type="Id.SpriteElement" Optional="false">The unique ID value of the sprite element to change</Parameter>
 			<Parameter Name="yscale" Type="Real" Optional="false">The yscale value (default is 1)</Parameter>
 		</Function>
-		<Function Name="layer_tilemap_create" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="layer_tilemap_create" Deprecated="false" ReturnType="Id.TileMapElement" Pure="false">
 			<Description>With this function you can assign a tile-set resource to a layer to be used as a tile map in your project. You supply the layer ID (which you get when you create the layer using layer_create()) or the layer name (as a string - this will have a performance impact) and then an initial (x, y) position to add the tile map to the room, the tile set resource to use, and then the width and height of the tile map in cells (ie: a width of 20 and a height of 10 will create a tile map with 200 cells that is 20 cells wide and 10 cells tall), with the size of the cells themselves being defined by the tile set chosen. It is worth noting that you cannot place tiles at negative positions within the tile map, so all tiles must be placed within the cell spaces 0 to width - 1, 0 to height - 1.</Description>
 			<Parameter Name="layer_id" Type="String,Id.Layer" Optional="false">The unique ID value of the layer to target (or the layer name as a string)</Parameter>
 			<Parameter Name="x" Type="Real" Optional="false">The x position of the tile map in the room</Parameter>
@@ -1935,7 +1935,7 @@
 			<Description>This function will return the name as a string of the specified script. This name is the one that has been specified for the script in the Asset Browser of the main GameMaker window. For more information about scripts, see The Script Editor.</Description>
 			<Parameter Name="scr" Type="Asset.GMScript,Function" Optional="false">The index of the script that you want to get the name of.</Parameter>
 		</Function>
-		<Function Name="sequence_create" Deprecated="false" ReturnType="Struct.Sequence" Pure="true">
+		<Function Name="sequence_create" Deprecated="false" ReturnType="Struct.Sequence" Pure="false">
 			<Description>With this function you can create a new sequence object which you can then add tracks to. The function returns a struct which you can then access to setup the new sequence you have created. The contents of this struct are detailed on this page. The sequence object struct can then be used to create instances of the sequence on a room layer using the function layer_sequence_create(). Note that when creating sequence objects in this way you should remove them again by calling the function sequence_destroy() when they are no longer required, otherwise you will have a memory leak which can slow down and eventually crash your game.</Description>
 		</Function>
 		<Function Name="sequence_destroy" Deprecated="false" ReturnType="Undefined" Pure="false">
@@ -2108,7 +2108,7 @@
 			<Parameter Name="track" Type="Real" Optional="false">The animation track to set the frame of.</Parameter>
 			<Parameter Name="position" Type="Real" Optional="false">The new position for the animation track.</Parameter>
 		</Function>
-		<Function Name="skeleton_attachment_create" Deprecated="false" ReturnType="Any" Pure="true">
+		<Function Name="skeleton_attachment_create" Deprecated="false" ReturnType="Any" Pure="false">
 			<Description>When you create you skeletal animation sprite, you can assign attachment slots and attachments to go in them. These are simply images that are apart from the animation but when attached will move along with the bone they are attached to. Normally you would assign these attachments in your animation program (Spine), but with this function you can create your own at run-time using a sprite asset from your game. the function requires that you give the attachment a UNIQUE name (as a string) and then set the sprite_index and image_index to use, as well as the x and y origin (which can be different to that defined by the sprite in the sprite properties), and you can also set any transforms that you wish to be applied to the image when attached. If the attachment was successfully created the function will return 1 and if it was not (you supplied an invalid sprite index, or the base sprite is not a Spine sprite) then it will return -1.</Description>
 			<Parameter Name="name" Type="String" Optional="false">The name (as a string) of the attachment to create.</Parameter>
 			<Parameter Name="sprite" Type="Asset.GMSprite" Optional="false">The sprite_index to get the attachment image from.</Parameter>
@@ -2119,7 +2119,7 @@
 			<Parameter Name="yscale" Type="Real" Optional="false">The vertical scaling of the image, as a multiplier: 1 = normal scaling, 0.5 is half etc...</Parameter>
 			<Parameter Name="rot" Type="Real" Optional="false">The rotation of the image. 0=normal, 90=turned 90 degrees counter-clockwise etc.</Parameter>
 		</Function>
-		<Function Name="skeleton_attachment_create_colour" Deprecated="false" ReturnType="Any" Locale="GB" Pure="true">
+		<Function Name="skeleton_attachment_create_colour" Deprecated="false" ReturnType="Any" Locale="GB" Pure="false">
 			<Description>When you create you skeletal animation sprite, you can assign attachment slots and attachments to go in them. These are simply images (sprites) that are separate from the animation but when attached will move along with the bone they are attached to. Normally you would assign these attachments in your animation program (Spine), but with this function you can create your own at run-time using a sprite asset from your game. the function requires that you give the attachment a UNIQUE name (as a string) and then set the sprite_index and image_index to use, as well as the x and y origin (which can be different to that defined by the sprite in the sprite properties), and you can also set any transforms that you wish to be applied to the image when attached, as well as the colour to be blended with the image and it&apos;s alpha (transparency) value. If the attachment was successfully created the function will return 1 and if it was not (you supplied an invalid sprite index, or the base sprite is not a Spine sprite) then it will return -1.</Description>
 			<Parameter Name="name" Type="String" Optional="false">The name (as a string) of the attachment to create.</Parameter>
 			<Parameter Name="sprite" Type="Asset.GMSprite" Optional="false">The sprite_index to get the attachment image from.</Parameter>
@@ -2160,7 +2160,7 @@
 			<Parameter Name="colour" Type="Constant.Color" Optional="false">The colour value to use (A constant, integer or hex value).</Parameter>
 			<Parameter Name="alpha" Type="Real" Optional="false">The alpha value to use (from 0 to 1).</Parameter>
 		</Function>
-		<Function Name="skeleton_attachment_destroy" Deprecated="false" ReturnType="Any" Locale="GB" Pure="true">
+		<Function Name="skeleton_attachment_destroy" Deprecated="false" ReturnType="Any" Locale="GB" Pure="false">
 			<Description>This function destroys a custom attachment previously created using the skeleton_attachment_create() or skeleton_attachment_replace() functions. Any slots using the attachment will be cleared.</Description>
 			<Parameter Name="name" Type="String" Optional="false">The name (as a string) of the attachment to destroy.</Parameter>
 		</Function>
@@ -2266,7 +2266,7 @@
 		<Function Name="skeleton_get_num_bounds" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>This function will return the number of bounding boxes associated with the skeleton animation sprite assigned to the instance running the code. This can then be used along with the function skeleton_get_bounds() to retrieve data about each of the bounding boxes.</Description>
 		</Function>
-		<Function Name="skeleton_skin_create" Deprecated="false" ReturnType="Struct.SkeletonSkin" Pure="true">
+		<Function Name="skeleton_skin_create" Deprecated="false" ReturnType="Struct.SkeletonSkin" Pure="false">
 			<Description>Creates a new skin by combining one or more skins defined in the sprite. This can be used (for example) to combine multiple skins defining different pieces of clothing or accessories on a character sprite.</Description>
 			<Parameter Name="skin_name" Type="String" Optional="false">The name of the skin to create.</Parameter>
 			<Parameter Name="base_skins" Type="Array[String]" Optional="false">Array of skin names defined in the sprite to combine.</Parameter>
@@ -2833,19 +2833,19 @@
 			<Parameter Name="offset" Type="Real" Optional="false">The data offset value.</Parameter>
 			<Parameter Name="size" Type="Real" Optional="false">The size of the buffer.</Parameter>
 		</Function>
-		<Function Name="buffer_create" Deprecated="false" ReturnType="Id.Buffer" Pure="true">
+		<Function Name="buffer_create" Deprecated="false" ReturnType="Id.Buffer" Pure="false">
 			<Description>You use this function to allocate a portion of memory as a buffer in your game, with the function returning the unique buffer id that should be stored in a variable and used for all further function calls to the buffer. The buffer can then be used to store different types of data (specified when you write to the buffer using the buffer_write() function, with the following constants being used to define the buffer type:</Description>
 			<Parameter Name="size" Type="Real" Optional="false">The size (in bytes) of the buffer.</Parameter>
 			<Parameter Name="type" Type="Constant.BufferType" Optional="false">The type of buffer to create (see the constants list above).</Parameter>
 			<Parameter Name="alignment" Type="Real" Optional="false">The byte alignment for the buffer</Parameter>
 		</Function>
-		<Function Name="buffer_create_from_vertex_buffer" Deprecated="false" ReturnType="Id.Buffer" Pure="true">
+		<Function Name="buffer_create_from_vertex_buffer" Deprecated="false" ReturnType="Id.Buffer" Pure="false">
 			<Description>You use this function to allocate a portion of memory as a buffer in your game filled with the data from a previously created vertex buffer. The function returns a unique buffer id that should be stored in a variable and used for all further function calls to the buffer. The function takes the id for the vertex buffer to use (as returned by the function vertex_create_buffer(), for example) with the following constants being used to define the buffer type:</Description>
 			<Parameter Name="vertex_buffer" Type="Id.VertexBuffer" Optional="false">The vertex buffer index to use.</Parameter>
 			<Parameter Name="type" Type="Constant.BufferType" Optional="false">The type of buffer to create (see the constants list above).</Parameter>
 			<Parameter Name="alignment" Type="Real" Optional="false">The byte alignment for the buffer</Parameter>
 		</Function>
-		<Function Name="buffer_create_from_vertex_buffer_ext" Deprecated="false" ReturnType="Id.Buffer" Pure="true">
+		<Function Name="buffer_create_from_vertex_buffer_ext" Deprecated="false" ReturnType="Id.Buffer" Pure="false">
 			<Description>You use this function to allocate a portion of memory as a buffer in your game filled with the data from a previously created vertex buffer. The function returns a unique buffer id that should be stored in a variable and used for all further function calls to the buffer. The function takes the id for the vertex buffer to use (as returned by the function vertex_create_buffer(), for example) with the following constants being used to define the buffer type:</Description>
 			<Parameter Name="vertex_buffer" Type="Id.VertexBuffer" Optional="false">The vertex buffer index to use.</Parameter>
 			<Parameter Name="type" Type="Constant.BufferType" Optional="false">The type of buffer to create (see the constants list below).</Parameter>
@@ -3071,7 +3071,7 @@
 			<Parameter Name="yoffset" Type="Real" Optional="true">[Optional] The offset along the Y axis of the surface to add from</Parameter>
 			<Parameter Name="quantization" Type="Real" Optional="true">[Optional] The quantization amount from 0 to 3 (0 lowest quality, 3 highest quality, default is 2)</Parameter>
 		</Function>
-		<Function Name="gif_open" Deprecated="false" ReturnType="Id.Gif" Pure="true">
+		<Function Name="gif_open" Deprecated="false" ReturnType="Id.Gif" Pure="false">
 			<Description>With this function you can create an empty GIF format image, ready to have data added to it. When you call the function, you need to specify the width and height of the GIF (in pixels, and there is no upper limit on size except for available memory), and the function will return the unique ID value used to identify the gift in subsequent functions, or it will return -1 if the gif could not be initialized (for example, if the width/height are too big for the memory available). You may also specify an optional argument to set the &quot;clear colour&quot; for the GIF. This is an RGB value (no alpha component), and will clear the gif to this colour before anything is added to it. If you do not supply a clear colour argument, the default colour of black will be used.</Description>
 			<Parameter Name="width" Type="Real" Optional="false">The width of the gif to create</Parameter>
 			<Parameter Name="height" Type="Real" Optional="false">The height of the gif to create</Parameter>
@@ -3107,10 +3107,10 @@
 			<Parameter Name="dest_camera_id" Type="Id.Camera" Optional="false">The unique camera ID value for the camera the values will be copied to.</Parameter>
 			<Parameter Name="src_camera_id" Type="Id.Camera" Optional="false">The unique camera ID value for the camera the values will be copied from.</Parameter>
 		</Function>
-		<Function Name="camera_create" Deprecated="false" ReturnType="Id.Camera" Pure="true">
+		<Function Name="camera_create" Deprecated="false" ReturnType="Id.Camera" Pure="false">
 			<Description>This function will create an &quot;empty&quot; camera, ie: a camera with no view or projection settings defined. Once you have created the camera you can then use the different matrix functions to set the view and projection matrices. You can also use this function to create the camera and then use the different camera_set_* functions to set up the view, however note that you must provide at least a position and view size, otherwise the resulting camera will not be valid and give odd results if applied to a view port (if you do not set the object following, borders or move speed these will be set to the default values for a view camera in the Room Editor).</Description>
 		</Function>
-		<Function Name="camera_create_view" Deprecated="false" ReturnType="Id.Camera" Pure="true">
+		<Function Name="camera_create_view" Deprecated="false" ReturnType="Id.Camera" Pure="false">
 			<Description>This function will create a new camera and then set its view into the room, before return the unique ID value to identify the camera in future function calls. The camera will be created using the values that you set in this function for position, size and other details which correlate to the values you set in the Room Editor (see here). Note that this function can take a variable number of arguments with only the x/y position and width/height arguments being obligatory. Any arguments not supplied will use their default arguments.</Description>
 			<Parameter Name="room_x" Type="Real" Optional="false">The x position (within the room) of the left side of the area the camera view captures.</Parameter>
 			<Parameter Name="room_y" Type="Real" Optional="false">The y position (within the room) of the top of the area the camera view captures.</Parameter>
@@ -3442,6 +3442,13 @@
 			<Parameter Name="w" Type="Real" Optional="false">The new width of the window.</Parameter>
 			<Parameter Name="h" Type="Real" Optional="false">The new height of the window.</Parameter>
 		</Function>
+		<Function Name="window_enable_borderless_fullscreen" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>With this function you can enable borderless fullscreen mode which uses a borderless window when switching to fullscreen rather than making the game take over exclusive use of the display. Note that this will only take effect on the next switch to fullscreen (so if the game is currently running in fullscreen then nothing will immediately change).</Description>
+			<Parameter Name="enable" Type="Bool" Optional="false">Whether to enable borderless fullscreen mode (true) or not (false).</Parameter>			
+		</Function>
+		<Function Name="window_get_borderless_fullscreen" Deprecated="false" ReturnType="Undefined" Pure="true">
+			<Description>This function returns whether fullscreen mode uses a borderless window or whether the game takes exclusive control of the display.</Description>
+		</Function>		
 		<Function Name="window_views_mouse_get_x" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>This function returns the x-coordinate of the mouse with respect to all the active views and returns the same value mouse_x.</Description>
 		</Function>
@@ -3510,7 +3517,7 @@
 			<Parameter Name="destination" Type="Id.DsGrid" Optional="false">This index of the grid to copy to.</Parameter>
 			<Parameter Name="source" Type="Id.DsGrid" Optional="false">This index of the grid to copy from.</Parameter>
 		</Function>
-		<Function Name="ds_grid_create" Deprecated="false" ReturnType="Id.DsGrid" Pure="true">
+		<Function Name="ds_grid_create" Deprecated="false" ReturnType="Id.DsGrid" Pure="false">
 			<Description>With this function you can create a new DS grid data structure of the specified cell width and height. This function returns an id which must be used in all further functions that deal with this DS grid.</Description>
 			<Parameter Name="w" Type="Real" Optional="false">The width of the grid to be created.</Parameter>
 			<Parameter Name="h" Type="Real" Optional="false">The height of the grid to be created.</Parameter>
@@ -3760,7 +3767,7 @@
 			<Parameter Name="id" Type="Id.DsList" Optional="false">The id of the list being copied to.</Parameter>
 			<Parameter Name="source" Type="Id.DsList" Optional="false">The id of the list to be copied from.</Parameter>
 		</Function>
-		<Function Name="ds_list_create" Deprecated="false" ReturnType="Id.DsList" Pure="true">
+		<Function Name="ds_list_create" Deprecated="false" ReturnType="Id.DsList" Pure="false">
 			<Description>This function will create a new list data-structure and return the index value. This value should be stored in a variable and used in all further function calls relating to the list. Note that if you try and access a value in the list before it has been populated - i.e. the list is &quot;empty&quot; - then the return value may be 0 since internally the first few entries in the list are set when created to minimize performance issues when initially adding items to the list (although the ds_list_size() function will still return 0 on a newly created list). If you wish to ensure that the list is &quot;truly&quot; empty on create, then you should call ds_list_clear() after creating the list, which will then mean that any values returned for unpopulated list slots will be undefined.</Description>
 		</Function>
 		<Function Name="ds_list_delete" Deprecated="false" ReturnType="Undefined" Pure="false">
@@ -3874,7 +3881,7 @@
 			<Parameter Name="id" Type="Id.DsMap" Optional="false">The id of the map you are copying to</Parameter>
 			<Parameter Name="source" Type="Id.DsMap" Optional="false">The id of the map you are copying from</Parameter>
 		</Function>
-		<Function Name="ds_map_create" Deprecated="false" ReturnType="Id.DsMap" Pure="true">
+		<Function Name="ds_map_create" Deprecated="false" ReturnType="Id.DsMap" Pure="false">
 			<Description>This function is used to create a new, empty, DS map and will return its id which is then used to access the data structure in all other DS map functions.</Description>
 		</Function>
 		<Function Name="ds_map_delete" Deprecated="false" ReturnType="Undefined" Pure="false">
@@ -3931,7 +3938,7 @@
 		<Function Name="ds_map_keys_to_array" Deprecated="false" ReturnType="Array[Any]" Pure="true">
 			<Description>With this function you can retrieve all of the keys that a DS map contains. You supply the DS map ID to get the keys from (as returned by ds_map_create()) and the function will return an array where each entry in the array is a key from the DS map. The function has an optional second argument where you can supply an array that you have created, in which case the map key data will be appended onto any existing data in the array. Note that the function will modify the array supplied directly, but will also return a reference to it (or a reference to a new array if none is supplied).</Description>
 			<Parameter Name="id" Type="Id.DsMap" Optional="false">The id of the map to use.</Parameter>
-			<Parameter Name="array" Type="Array" Optional="true">OPTIONAL! The array to append the DS map keys to.</Parameter>
+			<Parameter Name="array" Type="Array" Optional="true">The array to append the DS map keys to.</Parameter>
 		</Function>
 		<Function Name="ds_map_read" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function will take a string that has previously been created by the function ds_map_write() and then read it into a previously created DS map. If the map that the string is being read into contains any key/value pairs, these will be cleared first before the saved map is re-constructed.</Description>
@@ -3988,7 +3995,7 @@
 		<Function Name="ds_map_values_to_array" Deprecated="false" ReturnType="Array[Any]" Pure="true">
 			<Description>With this function you can retrieve all of the values that a DS map contains for each key in the map. You supply the DS map ID to get the keys from (as returned by ds_map_create()) and the function will return an array where each entry in the array is a value from the DS map (for example, if the map has 10 keys, then an array of 10 entries will be returned with each entry corresponding to a value for a key). The function has an optional second argument where you can supply an array that you have created, in which case the map key value data will be appended onto any existing data in the array. Note that the function will modify the array supplied directly, but will also return a reference to it (or a reference to a new array if none is supplied).</Description>
 			<Parameter Name="id" Type="Id.DsMap" Optional="false">The id of the map to use.</Parameter>
-			<Parameter Name="array" Type="Array" Optional="true">OPTIONAL! The array to append the DS map values to.</Parameter>
+			<Parameter Name="array" Type="Array" Optional="true">The array to append the DS map values to.</Parameter>
 		</Function>
 		<Function Name="ds_map_write" Deprecated="false" ReturnType="String" Pure="true">
 			<Description>This function will turn the DS map data of the specified map into string format which can then be written to an *.ini or a *.txt file for easy storage. This string can then be later read back into a new ds_map using ds_map_read().</Description>
@@ -4015,7 +4022,7 @@
 			<Parameter Name="id" Type="Id.DsPriority" Optional="false">The id of the priority queue to copy to.</Parameter>
 			<Parameter Name="source" Type="Id.DsPriority" Optional="false">The id of the priority queue to copy from.</Parameter>
 		</Function>
-		<Function Name="ds_priority_create" Deprecated="false" ReturnType="Id.DsPriority" Pure="true">
+		<Function Name="ds_priority_create" Deprecated="false" ReturnType="Id.DsPriority" Pure="false">
 			<Description>This function will create a new priority queue data-structure and return the index value. This value should be stored in a variable and used in all further function calls relating to the priority queue.</Description>
 		</Function>
 		<Function Name="ds_priority_delete_max" Deprecated="false" ReturnType="ArgumentIdentity" Pure="false">
@@ -4075,7 +4082,7 @@
 			<Parameter Name="id" Type="Id.DsQueue" Optional="false">The id of the NEW queue.</Parameter>
 			<Parameter Name="source" Type="Id.DsQueue" Optional="false">The ORIGINAL queue to copy to id.</Parameter>
 		</Function>
-		<Function Name="ds_queue_create" Deprecated="false" ReturnType="Id.DsQueue" Pure="true">
+		<Function Name="ds_queue_create" Deprecated="false" ReturnType="Id.DsQueue" Pure="false">
 			<Description>This function will create a new queue data-structure and return the index value. This value should be stored in a variable and used in all further function calls relating to the queue.</Description>
 		</Function>
 		<Function Name="ds_queue_dequeue" Deprecated="false" ReturnType="ArgumentIdentity" Pure="false">
@@ -4126,7 +4133,7 @@
 			<Parameter Name="id" Type="Id.DsStack" Optional="false">The id of the NEW stack.</Parameter>
 			<Parameter Name="source" Type="Id.DsStack" Optional="false">The ORIGINAL stack to copy to id.</Parameter>
 		</Function>
-		<Function Name="ds_stack_create" Deprecated="false" ReturnType="Id.DsStack" Pure="true">
+		<Function Name="ds_stack_create" Deprecated="false" ReturnType="Id.DsStack" Pure="false">
 			<Description>This function will create a new stack data-structure and return the index value. This value should be stored in a variable and used in all further function calls relating to the stack.</Description>
 		</Function>
 		<Function Name="ds_stack_destroy" Deprecated="false" ReturnType="Undefined" Pure="false">
@@ -4144,7 +4151,7 @@
 		<Function Name="ds_stack_push" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function will push (add) a value, which can be of any data type, onto the top of the stack. The function can take a further 14 optional arguments (making a total of 15 possible additions), permitting you to push multiple values consecutively to the stack in a single call.</Description>
 			<Parameter Name="id" Type="Id.DsStack" Coerce="true" Optional="false">The id of the data structure to push onto.</Parameter>
-			<Parameter Name="..." Type="ArgumentIdentity" Optional="true">The value to push onto the stack.</Parameter>
+			<Parameter Name="..." Type="ArgumentIdentity" Optional="false">The value to push onto the stack.</Parameter>
 		</Function>
 		<Function Name="ds_stack_read" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can recreate a saved DS stack (one that has previously been written as a string using ds_stack_write()). You must first create a new DS stack to read the string into, and if the DS stack already exists and has information stored in it, then this will be cleared before reading. This function is of vital importance when creating save/load mechanisms for your game.</Description>
@@ -4207,8 +4214,14 @@
 			<Parameter Name="scale" Type="Real" Optional="true">scale of the debug display. NOTE: clamped to between 0.5 and 4</Parameter>
 			<Parameter Name="alpha" Type="Real" Optional="true">alpha level of the debug windows. NOTE: clamped to between 0 and 1</Parameter>
 		</Function>
-		<Function Name="is_debug_overlay_open" Deprecated="false" ReturnType="Bool" Pure="false">
+		<Function Name="is_debug_overlay_open" Deprecated="false" ReturnType="Bool" Pure="true">
 			<Description>Returns true if the debug overlay is open and false otherwise</Description>
+		</Function>
+		<Function Name="is_mouse_over_debug_overlay" Deprecated="false" ReturnType="Bool" Pure="true">
+			<Description>Returns true if the mouse is over a debug overlay window or gadget, or is being used by the debug sub-systems (i.e. for dragging)</Description>
+		</Function>
+		<Function Name="is_keyboard_used_debug_overlay" Deprecated="false" ReturnType="Bool" Pure="true">
+			<Description>Returns true if the keyboard is being used by the debug overlay system</Description>
 		</Function>
 		<Function Name="show_debug_log" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function can be used to switch on and off the standard debug log and console when testing your game and is disabled by default.</Description>
@@ -4226,6 +4239,7 @@
 		<Function Name="dbg_section" Deprecated="false" ReturnType="Pointer.Section" Pure="false">
 			<Description>Declare a new debug section this will be added to the current debug view that is active. NOTE: if no debug view is active then a "Default" view is created for you.</Description>
 			<Parameter Name="name" Type="String" Optional="false">name of the debug section</Parameter>
+			<Parameter Name="open" Type="Bool" Optional="true">true if section is open when created, false if closed, defaults to true</Parameter>
 		</Function>
 		<Function Name="dbg_view_delete" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>Declare a new debug view that can be accessed from the debug overlay.</Description>
@@ -4256,10 +4270,10 @@
 			<Parameter Name="fontRange" Type="Real" Optional="true">fontRange type (default is -1 - Latin range)</Parameter>
 		</Function>
 		<Function Name="dbg_drop_down" Deprecated="false" ReturnType="Undefined" Pure="false">
-			<Description>Creates a drop down for a value within the current debug section, Either use an array of values (with an optional array of labels for those names) OR the values and names  are declared as a comma delimited string - where integer values can be specified after a colon symbol so &quot;Zero,One:10,Two:20&quot; will create a 3 entry drop down that will set the variable to the value 0, 10 or 20 depending on which is selected. NOTE: if no section is declared a "Default" section will be created.</Description>
+			<Description>Creates a drop down for a value within the current debug section, Either use an array of values (with an optional array of labels for those names) OR the values and names are declared as a comma delimited string - where integer values can be specified after a colon symbol so &quot;Zero,One:10,Two:20&quot; will create a 3 entry drop down that will set the variable to the value 0, 10 or 20 depending on which is selected. NOTE: if no section is declared a "Default" section will be created.</Description>
 			<Parameter Name="dbgref" Type="Id.DbgRef" Optional="false">reference to the variable to change</Parameter> 
-			<Parameter Name="specifierOrArrayOfValues" Type="String" Optional="false">dropdown specifier or array of values</Parameter>
-			<Parameter Name="labelOrArrayOfLabels" Type="String" Optional="true">label to use or aarray of Labels</Parameter>
+			<Parameter Name="specifierOrArrayOfValues" Type="String|Array[String]" Optional="false">dropdown specifier or array of values</Parameter>
+			<Parameter Name="labelOrArrayOfLabels" Type="String|Array[String]" Optional="true">label to use or aarray of Labels</Parameter>
 			<Parameter Name="label" Type="String" Optional="true">label to use.</Parameter>
 		</Function>
 		<Function Name="dbg_watch" Deprecated="false" ReturnType="Undefined" Pure="false">
@@ -4276,11 +4290,14 @@
 			<Parameter Name="dbgrefSprite" Type="Id.DbgRef" Optional="false">reference to the variable for the sprite index</Parameter>
 			<Parameter Name="dbgrefSpriteIndex" Type="Id.DbgRef" Optional="false">reference to the variable for the image index</Parameter>
 			<Parameter Name="label" Type="String" Optional="true">label to use.</Parameter>
+			<Parameter Name="width" Type="Real" Optional="true">width to draw the sprite at, if no height given then maintains the correct ratio for the sprite, default is width of the sprite</Parameter>
+			<Parameter Name="height" Type="Real" Optional="true">height draw the sprite at, default is height of the sprite (or uses a given width to maintain correct ratio of width to height)</Parameter>
 		</Function>
 		<Function Name="dbg_text_input" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>Creates a text input entry within the current debug section. NOTE: if no section is declared a "Default" section will be created.</Description>
 			<Parameter Name="dbgref" Type="Id.DbgRef" Optional="false">reference to the variable to change</Parameter>
 			<Parameter Name="label" Type="String" Optional="true">label to use.</Parameter>
+			<Parameter Name="type" Type="String" Optional="true">type to store value as, default is string, use "s" or "t" for string, use "i" or "d" for integer, use "f", "r" or "g" for real</Parameter>
 		</Function>
 		<Function Name="dbg_checkbox" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>Creates a check box entry within the current debug section, variable will be a boolean value true or false. NOTE: if no section is declared a "Default" section will be created.</Description>
@@ -4954,7 +4971,7 @@
 			<Parameter Name="ps" Type="Id.ParticleSystem" Optional="false">The particle system that the emitter is in.</Parameter>
 			<Parameter Name="ind" Type="Id.ParticleEmitter" Optional="false">The index of the emitter to clear.</Parameter>
 		</Function>
-		<Function Name="part_emitter_create" Deprecated="false" ReturnType="Id.ParticleEmitter" Pure="true">
+		<Function Name="part_emitter_create" Deprecated="false" ReturnType="Id.ParticleEmitter" Pure="false">
 			<Description>This function must be used to create a new emitter and assign it to a given particle system. The function will return the index value for the new emitter which must be stored in a variable and used in all further functions that reference the emitter, and the emitter itself must be destroyed when no longer being used to prevent memory leaks (this can be achieved using the specific emitter destroy functions or by destroying the whole particle system that the emitter belongs to).</Description>
 			<Parameter Name="ps" Type="Id.ParticleSystem" Optional="false">The particle system to create the emitter in.</Parameter>
 		</Function>
@@ -4967,7 +4984,7 @@
 			<Description>This function will remove all defined emitters from the given system and clear them from memory (this will also stop any particles from being produced by the given emitter, but it does NOT remove them from the room). This function should always be called when the emitters are no longer needed for the system to prevent memory leaks and errors.</Description>
 			<Parameter Name="ps" Type="Id.ParticleSystem" Optional="false">The particle system to destroy all emitters from.</Parameter>
 		</Function>
-		<Function Name="part_emitter_enable" Deprecated="false" ReturnType="Bool" Pure="true">
+		<Function Name="part_emitter_enable" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can enable or disable a particle emitter. Disabled particle emitters are not updated nor rendered and they do not spawn new particles.</Description>
 			<Parameter Name="ps" Type="Id.ParticleSystem" Optional="false">The particle system that the emitter is in.</Parameter>
 			<Parameter Name="ind" Type="Id.ParticleEmitter" Optional="false">The index of the emitter to enable or disable.</Parameter>
@@ -5072,11 +5089,11 @@
 			<Description>With this function you can check to see if a particle system asset with the given index exists or not.</Description>
 			<Parameter Name="ind" Type="Asset.GMParticleSystem" Optional="false">The index of the particle system asset to check for.</Parameter>
 		</Function>
-		<Function Name="part_system_create" Deprecated="false" ReturnType="Id.ParticleSystem" Pure="true">
+		<Function Name="part_system_create" Deprecated="false" ReturnType="Id.ParticleSystem" Pure="false">
 			<Description>This function is used to create a new particle system and will return a unique index number that should be stored and used in all further functions relating to that system. The system will be assigned a managed layer and will be set to have a depth of 0. Managed layers are not accessible to the user and used only for internal management when depth is used instead of layers. Normally you would use the function part_system_create_layer() instead of this one.</Description>
 			<Parameter Name="partsys" Type="Asset.GMParticleSystem" Optional="true">A particle system resource to create an instance of.</Parameter>
 		</Function>
-		<Function Name="part_system_create_layer" Deprecated="false" ReturnType="Id.ParticleSystem" Pure="true">
+		<Function Name="part_system_create_layer" Deprecated="false" ReturnType="Id.ParticleSystem" Pure="false">
 			<Description>This function will create a new particle system on a given layer. You give the unique layer ID as returned by the function layer_create() or the name of the layer to use as a string - for example &quot;instance_layer&quot; - and then flag the system as being persistent or not. If the system is not flagged as persistent then it will be automatically destroyed at the end of the room it was created in (this is the same as if you had called the function part_system_destroy() and will also destroy any emitters associated with the system). However, when flagged as persistent, the system will be carried to the next room when the room is changed, and if the following room does not have a layer with the same name or depth as the one assigned, then a new layer will be created for the system that is persisting across the rooms, and it will be named the same as original layer. When changing rooms, if there is another layer in the following rooms with the same name, then the persisted instance will be assigned to the layer with the that name regardless of the depth of the layer. Finally, if a persisted system moves to a room with a layer at the same depth as the layer the system was created on, it will not be assigned to this layer, but instead a new layer will be created at the same depth (with the same name as the original layer).</Description>
 			<Parameter Name="layer" Type="Any" Optional="false">The layer ID value or string to assign the particle system to (can be any layer type)</Parameter>
 			<Parameter Name="persistent" Type="Bool" Optional="false">Flag the particle system as persistent (set to true) or not (set to false)</Parameter>
@@ -5216,7 +5233,7 @@
 			<Parameter Name="bmin" Type="Real" Optional="false">The minimum the final colour&apos;s blue component can be.</Parameter>
 			<Parameter Name="bmax" Type="Real" Optional="false">The maximum the final colour&apos;s blue component can be.</Parameter>
 		</Function>
-		<Function Name="part_type_create" Deprecated="false" ReturnType="Id.ParticleType" Pure="true">
+		<Function Name="part_type_create" Deprecated="false" ReturnType="Id.ParticleType" Pure="false">
 			<Description>With this function you can create a new particle type and the return value should be stored in a variable for use in all subsequent particle functions.</Description>
 		</Function>
 		<Function Name="part_type_death" Deprecated="false" ReturnType="Undefined" Pure="false">
@@ -5380,19 +5397,19 @@
 			<Parameter Name="colour" Type="Constant.Color" Optional="false">The colour for this vertex (can be a constant or a hex value).</Parameter>
 			<Parameter Name="alpha" Type="Real" Optional="false">The alpha value for the vertex (from 0 to 1).</Parameter>
 		</Function>
-		<Function Name="vertex_create_buffer" Deprecated="false" ReturnType="Id.VertexBuffer" Pure="true">
+		<Function Name="vertex_create_buffer" Deprecated="false" ReturnType="Id.VertexBuffer" Pure="false">
 			<Description>With this function you can create a new vertex buffer. This is a special grow buffer created by GameMaker which is pre-formatted for use when building primitives (for use with shaders, for example). The function will return a &quot;Pointer&quot; (index) for the buffer which should then be used in all further calls to it.</Description>
 		</Function>
-		<Function Name="vertex_create_buffer_ext" Deprecated="false" ReturnType="Id.VertexBuffer" Pure="true">
+		<Function Name="vertex_create_buffer_ext" Deprecated="false" ReturnType="Id.VertexBuffer" Pure="false">
 			<Description>As with the function vertex_create_buffer(), this function will create a new vertex buffer. This is a special grow buffer created by GameMaker which is pre-formatted for use when building primitives for use with shaders. You can specify an initial starting size for the buffer (in bytes) and it will return a &quot;handle&quot; (index) for the buffer which should then be used in all further calls to the buffer.</Description>
 			<Parameter Name="size" Type="Real" Optional="false">The initial size of the buffer (in bytes).</Parameter>
 		</Function>
-		<Function Name="vertex_create_buffer_from_buffer" Deprecated="false" ReturnType="Id.VertexBuffer" Pure="true">
+		<Function Name="vertex_create_buffer_from_buffer" Deprecated="false" ReturnType="Id.VertexBuffer" Pure="false">
 			<Description>As with the function vertex_create_buffer(), this function will create a new vertex buffer, only now the vertex data it stores is copied from the regular buffer that is specified as the source. The buffer created is a special grow buffer which is pre-formatted with the vertex format for building primitives for use with (for example) shaders. This function requires that you supply the pointer to a previously created regular buffer, and a vertex format that should be applied to the copied data.</Description>
 			<Parameter Name="buffer" Type="Id.Buffer" Optional="false">The buffer to create the vertex buffer from.</Parameter>
 			<Parameter Name="format" Type="Id.VertexFormat" Optional="false">The primitive vertex format to use.</Parameter>
 		</Function>
-		<Function Name="vertex_create_buffer_from_buffer_ext" Deprecated="false" ReturnType="Id.VertexBuffer" Pure="true">
+		<Function Name="vertex_create_buffer_from_buffer_ext" Deprecated="false" ReturnType="Id.VertexBuffer" Pure="false">
 			<Description>As with the function vertex_create_buffer(), this function will create a new vertex buffer, only now the vertex data it stores is copied from the regular buffer that is specified as the source. The buffer is pre-formatted with the vertex format for building primitives for use with (for example) shaders, and you can also supply an offset within the source buffer to copy from and the number of vertices that the final buffer should have. Note that if the number of vertices does not match those being copied you may get corrupted vertex data.</Description>
 			<Parameter Name="buffer" Type="Id.Buffer" Optional="false">The buffer to create the vertex buffer from.</Parameter>
 			<Parameter Name="format" Type="Id.VertexFormat" Optional="false">The primitive vertex format to use.</Parameter>
@@ -5479,7 +5496,7 @@
 		<Function Name="vertex_format_end" Deprecated="false" ReturnType="Id.VertexFormat" Pure="false">
 			<Description>This function must be called after defining any new vertex format. It returns the new format &quot;handle&quot; (index) which must be used in all further vertex functions that refer to this new format.</Description>
 		</Function>
-		<Function Name="vertex_format_get_info" Deprecated="false" ReturnType="Struct.VertexFormatInfo" Pure="false">
+		<Function Name="vertex_format_get_info" Deprecated="false" ReturnType="Struct.VertexFormatInfo" Pure="true">
 			<Description>This function is used to retrieve information for the given vertex format. You supply a vertex format index and the function returns a struct with the following variables:</Description>
 			<Parameter Name="format_id" Type="Id.VertexFormat" Optional="false">The vertex format for which information should be retrieved.</Parameter>
 		</Function>
@@ -5516,10 +5533,18 @@
 			<Parameter Name="z" Type="Real" Optional="false">The z position.</Parameter>
 		</Function>
 		<Function Name="vertex_submit" Deprecated="false" ReturnType="Undefined" Pure="false">
-			<Description>You can use this function to submit the contents of a vertex buffer to the graphics pipeline for use with a shader. You supply the buffer index to use, the base primitive type to use (see the constants below) and the texture that is to be used. The base primitive type is only used for assigning the order in which the vertexes that you stored in the buffer are drawn and connected, but the actual data used for each of the vertexes will be that which you defined when creating the vertex buffer.</Description>
+			<Description>You can use this function to submit the contents of a vertex buffer to the graphics pipeline. You supply the buffer index to use, the base primitive type to use (see the constants below) and the texture that is to be used. The base primitive type is only used for assigning the order in which the vertexes that you stored in the buffer are drawn and connected, but the actual data used for each of the vertexes will be that which you defined when creating the vertex buffer.</Description>
 			<Parameter Name="buffer" Type="Id.VertexBuffer" Optional="false">The buffer to use.</Parameter>
 			<Parameter Name="primitive" Type="Constant.PrimitiveType" Optional="false">The primitive base type.</Parameter>
 			<Parameter Name="texture" Type="Pointer.Texture,Real" Optional="false">The texture to use (or -1 for no texture).</Parameter>
+		</Function>
+		<Function Name="vertex_submit_ext" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>You can use this function to submit the contents of a vertex buffer to the graphics pipeline. You supply the buffer index to use, the base primitive type to use (see the constants below), the texture that is to be used, the index of the first vertex to start submitting form and number of vertices to submit. The base primitive type is only used for assigning the order in which the vertexes that you stored in the buffer are drawn and connected, but the actual data used for each of the vertexes will be that which you defined when creating the vertex buffer.</Description>
+			<Parameter Name="buffer" Type="Id.VertexBuffer" Optional="false">The buffer to use.</Parameter>
+			<Parameter Name="primitive" Type="Constant.PrimitiveType" Optional="false">The primitive base type.</Parameter>
+			<Parameter Name="texture" Type="Pointer.Texture,Real" Optional="false">The texture to use (or -1 for no texture).</Parameter>
+			<Parameter Name="offset" Type="Real" Optional="false">The index of the first vertex to submit. Must be a positive number.</Parameter>
+			<Parameter Name="number" Type="Real" Optional="false">Number of vertices to submit. Use -1 to submit all vertices after given offset.</Parameter>
 		</Function>
 		<Function Name="vertex_texcoord" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function will set the texture coordinates to use for the vertex currently being defined for the custom primitive. You supply the buffer to write the data into as well as the UV position within the texture to use.</Description>
@@ -5852,13 +5877,13 @@
 			<Parameter Name="ws" Type="Real" Optional="false">The width of the area in the source surface to copy from.</Parameter>
 			<Parameter Name="hs" Type="Real" Optional="false">The height of the area in the source surface to copy from.</Parameter>
 		</Function>
-		<Function Name="surface_create" Deprecated="false" ReturnType="Id.Surface" Pure="true">
+		<Function Name="surface_create" Deprecated="false" ReturnType="Id.Surface" Pure="false">
 			<Description>This function is used to create a surface and will return the index of the surface which should be stored in a variable for future function calls. When the surface is first created, it may contain &quot;noise&quot; as basically it is just an area of memory that is put aside for the purpose (and that memory may still contain information), so you may want to clear the surface before use with a function like draw_clear_alpha().</Description>
 			<Parameter Name="w" Type="Real" Optional="false">The width of the surface to be created.</Parameter>
 			<Parameter Name="h" Type="Real" Optional="false">The height of the surface to be created.</Parameter>
 			<Parameter Name="format" Type="Constant.SurfaceFormatType" Optional="true">The format of the surface to be created.</Parameter>
 		</Function>
-		<Function Name="surface_create_ext" Deprecated="false" ReturnType="Id.Surface" Pure="true">
+		<Function Name="surface_create_ext" Deprecated="false" ReturnType="Id.Surface" Pure="false">
 			<Description>This function allows you to attach a surface to a canvas element that already exists in your web page, meaning that you can effectively split up portions of your game to be drawn at various different places within the page. To that end, you must have defined the canvas element correctly within the *.html page of your game using the correct sizes and names that correspond to the surfaces you wish to create. So, you would have your &quot;main&quot; canvas, and then your secondary surface canvas elements, which will be assigned using this function to the correct surfaces. The following image is an example of how a page with three canvas elements would be set up:</Description>
 			<Parameter Name="name" Type="String" Optional="false">The name of the canvas element to link the surface to.</Parameter>
 			<Parameter Name="w" Type="Real" Optional="false">The width of the surface to be created.</Parameter>
@@ -6152,7 +6177,7 @@
 			<Description>Closes a previously opened binary file. You supply the file ID value, as returned by the function file_bin_open().</Description>
 			<Parameter Name="binfile" Type="Id.BinaryFile" Optional="false">The ID of the file to close.</Parameter>
 		</Function>
-		<Function Name="file_bin_open" Deprecated="false" ReturnType="Id.BinaryFile" Pure="true">
+		<Function Name="file_bin_open" Deprecated="false" ReturnType="Id.BinaryFile" Pure="false">
 			<Description>This function will open the binary file with the indicated name. The mode indicates what can be done with the file:</Description>
 			<Parameter Name="fname" Type="String" Optional="false">The name of the file to read from.</Parameter>
 			<Parameter Name="mode" Type="Real" Optional="false">the indicator of what can be done with the file.</Parameter>
@@ -6203,11 +6228,14 @@
 		<Function Name="json_parse" Deprecated="false" ReturnType="Any" Pure="true">
 			<Description>This function can be used to parse a JSON string (either previously created using json_stringify or from any valid source), and convert it into a collection of arrays or structs, where an array is the equivalent of a JSON array and a struct is the equivalent of a JSON object. You supply the string to parse, and the function will return the top level array or struct which can then be checked in your code. If you are not sure of the contents of the JSON, you can use the different Variable Functions (like typeof() or variable_struct_get_names()) to check the returned contents. Note that trying to parse an invalid value (ie: not a string) will throw an exception error.</Description>
 			<Parameter Name="json" Type="String" Optional="false">The JSON to parse (a string)</Parameter>
+			<Parameter Name="filter" Type="Function" Optional="true">filter function called for each value element parsed in the data - function takes 2 arguments (key and value) and returns a value (this is the value that is then placed in the final output)</Parameter>
+			<Parameter Name="inhibit_string_convert" Type="Bool" Optional="true">Enable or disable the automatic conversion of strings into handles / int64 / nans and infinities. (default is false)</Parameter>
 		</Function>
 		<Function Name="json_stringify" Deprecated="false" ReturnType="String" Pure="true">
 			<Description>With this function you can convert single or nested structs and arrays into a valid JSON string. You supply the initial value to use (an array index or a struct reference) and then the function will &quot;stringify&quot; it, converting it into a JSON string, converting GameMaker arrays into JSON arrays, and GameMaker structs in to JSON objects.</Description>
 			<Parameter Name="val" Type="Any" Optional="false">The reference value for a struct or array to convert into a JSON string</Parameter>
 			<Parameter Name="prettify" Type="Bool" Optional="true">Whether of not the result JSON string should be prettified. Defaults to false.</Parameter>
+			<Parameter Name="filter" Type="Function" Optional="true">filter function called for each value element encoded in the output - function takes 2 arguments (key and value) and returns a value (this is the value that is then placed in the final output)</Parameter>
 		</Function>
 		<Function Name="load_csv" Deprecated="false" ReturnType="Id.DsGrid" Pure="true">
 			<Description>This function will load a CSV format file and convert it into a DS grid, returning the unique ID value for the grid created.</Description>
@@ -6247,16 +6275,16 @@
 			<Parameter Name="zip_file" Type="String" Optional="false">The zip file to open</Parameter>
 			<Parameter Name="target_directory" Type="String" Optional="false">The target directory to extract the files to</Parameter>
 		</Function>
-		<Function Name="zip_create" Deprecated="false" ReturnType="Struct.Zip" Pure="true">
+		<Function Name="zip_create" Deprecated="false" ReturnType="Struct.Zip" Pure="false">
 			<Description>This function will create a new zip object which files can be added to.</Description>			
 		</Function>
-		<Function Name="zip_add_file" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="zip_add_file" Deprecated="false" ReturnType="Real" Pure="false">
 			<Description>This function will add a reference to the specified source file with the desired destination path in the specified zip file. The file will be loaded and added to the zip on the call to zip_save().</Description>
 			<Parameter Name="zip_object" Type="Struct.Zip" Optional="false">The zip object which the file should be added to.</Parameter>	
 			<Parameter Name="dest" Type="String" Optional="false">The destination path within the zip file.</Parameter>
 			<Parameter Name="src" Type="String" Optional="false">The path to the source file to be added.</Parameter>
 		</Function>
-		<Function Name="zip_save" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="zip_save" Deprecated="false" ReturnType="Real" Pure="false">
 			<Description>This function will save a zip object to the specified path.</Description>
 			<Parameter Name="zip_object" Type="Struct.Zip" Optional="true">The zip object to be saved.</Parameter>
 			<Parameter Name="path" Type="String" Optional="true">The path the zip should be saved to.</Parameter>
@@ -6337,7 +6365,7 @@
 			<Parameter Name="filter" Type="String" Optional="false">The file type filter and/or name.</Parameter>
 			<Parameter Name="fname" Type="String" Optional="false">The suggested filename to use.</Parameter>
 		</Function>
-		<Function Name="get_open_filename_ext" Deprecated="false" ReturnType="String" Pure="true">
+		<Function Name="get_open_filename_ext" Deprecated="false" ReturnType="String" Pure="false">
 			<Description>This function opens a dialogue and asks the player for a filename to open with the given filter. The filter has the form &quot;name1|mask1|name2|mask2|...&quot;, where the mask may contain the different options with a semicolon between them and you can also use a &quot;*&quot; to mean any string. For example: &quot;bitmaps|*.bmp;*.wmf&quot;, would ask the user to select the name of a bitmap file from the system, but only those that have the two specified extensions (bmp and png). this function does not open the file itself! It only returns a string with the full name and path of the file. If the user presses &quot;Cancel&quot; an empty string &quot;&quot; is returned. You may also add in a directory to start the search from, and a caption to be shown at the top of the window instead of the default one.</Description>
 			<Parameter Name="filter" Type="String" Optional="false">The file type filter and/or name.</Parameter>
 			<Parameter Name="fname" Type="String" Optional="false">The suggested filename to use.</Parameter>
@@ -6349,7 +6377,7 @@
 			<Parameter Name="filter" Type="String" Optional="false">The file type filter and/or name.</Parameter>
 			<Parameter Name="fname" Type="String" Optional="false">The suggested filename to use.</Parameter>
 		</Function>
-		<Function Name="get_save_filename_ext" Deprecated="false" ReturnType="String" Pure="true">
+		<Function Name="get_save_filename_ext" Deprecated="false" ReturnType="String" Pure="false">
 			<Description>This function opens a dialogue and asks the player for a filename to save to with the given filter. The filter has the form &quot;name1|mask1|name2|mask2|...&quot;, where the mask may contain the different options with a semicolon between them and you can also use a &quot;*&quot; to mean any string. For example: &quot;bitmaps|*.bmp;*.wmf&quot;, would ask the user to select the name of a bitmap file from the system, but only those that have the two specified extensions (bmp and png). this function does not save the file itself! It only returns a string with the full name and path of the file. If the user presses &quot;Cancel&quot; an empty string &quot;&quot; is returned. You may also add in a directory to start the search from, and a caption to be shown at the top of the window instead of the default one.</Description>
 			<Parameter Name="filter" Type="String" Optional="false">The file type filter and/or name.</Parameter>
 			<Parameter Name="fname" Type="String" Optional="false">The suggested filename to use.</Parameter>
@@ -6421,19 +6449,19 @@
 			<Description>With this function you can get GameMaker to check the currently opened file to see if the line being read has finished. The function returns true if the end of the line has been reached and false otherwise.</Description>
 			<Parameter Name="fileid" Type="Id.TextFile" Optional="false">The id of the file to check.</Parameter>
 		</Function>
-		<Function Name="file_text_open_append" Deprecated="false" ReturnType="Id.TextFile" Pure="true">
+		<Function Name="file_text_open_append" Deprecated="false" ReturnType="Id.TextFile" Pure="false">
 			<Description>This function opens the text file with the indicated filename for writing (if the file does not exist, it is created), returning the unique id of the file that which should be stored in a variable as it will be used for all further actions to do with that file. The position within the file for writing to is set to the last line of text that the file contains. Note that if the file can&apos;t be created (because of an illegal filename, for example) the function will return -1.</Description>
 			<Parameter Name="fname" Type="String" Optional="false">The name of the file to append to.</Parameter>
 		</Function>
-		<Function Name="file_text_open_from_string" Deprecated="false" ReturnType="Id.TextFile" Pure="true">
+		<Function Name="file_text_open_from_string" Deprecated="false" ReturnType="Id.TextFile" Pure="false">
 			<Description>This function will create a text file from a string and open it for reading, returning the file &quot;handle&quot; that should be used in all further file function calls to read from this file. Note that this file is temporary and read only, and as such it will be removed from memory the moment it is closed.</Description>
 			<Parameter Name="string" Type="String" Optional="false">The string to create the file from.</Parameter>
 		</Function>
-		<Function Name="file_text_open_read" Deprecated="false" ReturnType="Id.TextFile" Pure="true">
+		<Function Name="file_text_open_read" Deprecated="false" ReturnType="Id.TextFile" Pure="false">
 			<Description>This function opens the text file with the indicated filename for reading only, returning the unique id of the file that which should be stored in a variable as it will be used for all further actions to do with that file. If the file does not exists then the function will return the value -1.</Description>
 			<Parameter Name="fname" Type="String" Optional="false">The name of the file to read from.</Parameter>
 		</Function>
-		<Function Name="file_text_open_write" Deprecated="false" ReturnType="Id.TextFile" Pure="true">
+		<Function Name="file_text_open_write" Deprecated="false" ReturnType="Id.TextFile" Pure="false">
 			<Description>This function opens the text file with the indicated filename for writing only (if the file does not exist, it is created), returning the unique id of the file that which should be stored in a variable as it will be used for all further actions to do with that file. Note that if the file can&apos;t be created (because of an illegal filename, for example) the function will return -1.</Description>
 			<Parameter Name="fname" Type="String" Optional="false">The name of the file to write to.</Parameter>
 		</Function>
@@ -7338,7 +7366,8 @@
 		</Function>
 		<Function Name="choose" Deprecated="false" ReturnType="ArgumentIdentity" Pure="true">
 			<Description>Sometimes you want to specify something other than numbers for a random selection, or the numbers you want are not in any real order or within any set range. In these cases you would use choose() to generate a random result. For example, say you want to create an object with a random sprite at the start, then you could use this function to set the sprite index to one of a set of given sprites. Note that you can have as many as you require (note that more arguments will mean that the function will be slower to parse).</Description>
-			<Parameter Name="..." Type="ArgumentIdentity" Optional="true">An input value that can be string, integer, variable or constant.</Parameter>
+			<Parameter Name="val1" Type="ArgumentIdentity" Optional="false">An input value that can be string, integer, variable or constant.</Parameter>
+			<Parameter Name="..." Type="ArgumentIdentity" Optional="false">An input value that can be string, integer, variable or constant.</Parameter>
 		</Function>
 		<Function Name="clamp" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>With this function you can maintain an input value between a specified range.</Description>
@@ -7399,19 +7428,23 @@
 		</Function>
 		<Function Name="max" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>This function returns the maximum of the input values, of which it can have up to 16. For example max(12, 96, 32, 75) will return 96 as that is the highest of all the input values.</Description>
-			<Parameter Name="..." Type="Real" Optional="true">The values to compare.</Parameter>
+			<Parameter Name="val0" Type="Real" Optional="false">The first value to compare.</Parameter>
+			<Parameter Name="..." Type="Real" Optional="false">The following values.</Parameter>
 		</Function>
 		<Function Name="mean" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>This function works by adding up all the input values and then dividing them by their own number. You can have as many arguments as you require (note that more arguments will mean that the function will be slower to parse). So, mean(2, 6, 9, 32) returns 12.25 as 2+6+9+32=49 and 49/4=12.25.</Description>
-			<Parameter Name="..." Type="Real" Optional="true">The values to compare.</Parameter>
+			<Parameter Name="val0" Type="Real" Optional="false">The first value to use in computation.</Parameter>
+			<Parameter Name="..." Type="Real" Optional="false">The following values.</Parameter>
 		</Function>
 		<Function Name="median" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>This function returns the median of the input values, that is, the middle value. When the number of arguments is even, the smaller of the two middle values is returned and the function can have as many arguments as required (note that more arguments will mean that the function will be slower to parse) which must all be real values. This means that, for example, median(43, 12, 25, 19, 6) would return 19 as it is the middle value between all the rest.</Description>
-			<Parameter Name="..." Type="Real" Optional="true">The values to compare.</Parameter>
+			<Parameter Name="val0" Type="Real" Optional="false">The first value to use in computation.</Parameter>
+			<Parameter Name="..." Type="Real" Optional="false">The following values.</Parameter>
 		</Function>
 		<Function Name="min" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>This function returns the minimum of the input values, of which it can have as many as you require (note that more arguments will mean that the function will be slower to parse). For example min(12, 96, 32, 75) will return 12 as that is the lowest of all the input values.</Description>
-			<Parameter Name="..." Type="Real" Optional="true">The values to compare.</Parameter>
+			<Parameter Name="val0" Type="Real" Optional="false">The first value to compare.</Parameter>
+			<Parameter Name="..." Type="Real" Optional="false">The following values.</Parameter>
 		</Function>
 		<Function Name="power" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>This will return the value of a number multiplied by itself &quot;n&quot; number of times. For example, power(5,3) will multiply 5 by itself 3 times and return 125, which is the same as saying 5*5*5=125. Please note that the &quot;x&quot; value (the number to change) cannot be a negative value.</Description>
@@ -7462,7 +7495,7 @@
 			<Parameter Name="prec" Type="Bool" Optional="false">Whether the check is based on pixel-perfect collisions (true = slow) or its bounding box in general (false = fast).</Parameter>
 			<Parameter Name="notme" Type="Bool" Optional="false">Whether the calling instance, if relevant, should be excluded (true) or not (false).</Parameter>
 		</Function>
-		<Function Name="collision_circle_list" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="collision_circle_list" Deprecated="false" ReturnType="Real" Pure="false">
 			<Description>This function is the same as the collision_circle() function, only instead of just detecting one instance in collision at a time, it will detect multiple instances. You supply the x/y position of the center of the circular area to check along with the radius and the object to check for, and you can set the check to be precise (in which case all instances being checked will need to have precise collision masks) and whether the check should include the calling instance or not.</Description>
 			<Parameter Name="x1" Type="Real" Optional="false">The x coordinate of the center of the circle to check.</Parameter>
 			<Parameter Name="y1" Type="Real" Optional="false">The y coordinate of the center of the circle to check.</Parameter>
@@ -7483,7 +7516,7 @@
 			<Parameter Name="prec" Type="Bool" Optional="false">Whether the check is based on precise collisions (true, which is slower) or its bounding box in general (false, faster).</Parameter>
 			<Parameter Name="notme" Type="Bool" Optional="false">Whether the calling instance, if relevant, should be excluded (true) or not (false).</Parameter>
 		</Function>
-		<Function Name="collision_ellipse_list" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="collision_ellipse_list" Deprecated="false" ReturnType="Real" Pure="false">
 			<Description>This function is the same as the collision_ellipse() function, only instead of just detecting one instance in collision at a time, it will detect multiple instances. You supply the x/y positions of the top left and bottom right of the elliptical area to check along with the object to check for, and you can set the check to be precise (in which case all instances being checked will need to have precise collision masks) and whether the check should include the calling instance or not.</Description>
 			<Parameter Name="x1" Type="Real" Optional="false">The x coordinate of the left side of the ellipse to check.</Parameter>
 			<Parameter Name="y1" Type="Real" Optional="false">The y coordinate of the top side of the ellipse to check.</Parameter>
@@ -7505,7 +7538,7 @@
 			<Parameter Name="prec" Type="Bool" Optional="false">Whether the check is based on precise collisions (true, which is slower) or its bounding box in general (false, faster).</Parameter>
 			<Parameter Name="notme" Type="Bool" Optional="false">Whether the calling instance, if relevant, should be excluded (true) or not (false).</Parameter>
 		</Function>
-		<Function Name="collision_line_list" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="collision_line_list" Deprecated="false" ReturnType="Real" Pure="false">
 			<Description>This function is the same as the collision_line() function, only instead of just detecting one instance in collision at a time, it will detect multiple instances. You supply the x/y positions of the start and end of the line to check along with the object to check for, and you can set the check to be precise (in which case all instances being checked will need to have precise collision masks) and whether the check should include the calling instance or not.</Description>
 			<Parameter Name="x1" Type="Real" Optional="false">The x coordinate of the start of the line.</Parameter>
 			<Parameter Name="y1" Type="Real" Optional="false">The y coordinate of the start of the line.</Parameter>
@@ -7525,7 +7558,7 @@
 			<Parameter Name="prec" Type="Bool" Optional="false">Whether the check is based on precise collisions (true, which is slower) or its bounding box in general (false, faster).</Parameter>
 			<Parameter Name="notme" Type="Bool" Optional="false">Whether the calling instance, if relevant, should be excluded (true) or not (false).</Parameter>
 		</Function>
-		<Function Name="collision_point_list" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="collision_point_list" Deprecated="false" ReturnType="Real" Pure="false">
 			<Description>This function is the same as the collision_point() function, only instead of just detecting one instance in collision at a time, it will detect multiple instances. You supply the x/y position of the point to check and you can set the check to be precise (in which case all instances being checked will need to have precise collision masks) and whether the check should include the calling instance or not.</Description>
 			<Parameter Name="x" Type="Real" Optional="false">The x coordinate of the point to check.</Parameter>
 			<Parameter Name="y" Type="Real" Optional="false">The y coordinate of the point to check.</Parameter>
@@ -7545,7 +7578,7 @@
 			<Parameter Name="prec" Type="Bool" Optional="false">Whether the check is based on precise collisions (true, which is slower) or its bounding box in general (false, faster).</Parameter>
 			<Parameter Name="notme" Type="Bool" Optional="false">Whether the calling instance, if relevant, should be excluded (true) or not (false).</Parameter>
 		</Function>
-		<Function Name="collision_rectangle_list" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="collision_rectangle_list" Deprecated="false" ReturnType="Real" Pure="false">
 			<Description>This function is the same as the collision_rectangle() function, only instead of just detecting one instance in collision at a time, it will detect multiple instances. You supply the x/y positions of the top left and bottom right of the area to check along with the object to check for, and you can set the check to be precise (in which case all instances being checked will need to have precise collision masks) and whether the check should include the calling instance or not.</Description>
 			<Parameter Name="x1" Type="Real" Optional="false">The x coordinate of the left side of the rectangle to check.</Parameter>
 			<Parameter Name="y1" Type="Real" Optional="false">The y coordinate of the top side of the rectangle to check.</Parameter>
@@ -7697,7 +7730,7 @@
 			<Parameter Name="x2" Type="Real" Optional="false">The x coordinate of the right side of the rectangle to check.</Parameter>
 			<Parameter Name="y2" Type="Real" Optional="false">The x coordinate of the bottom side of the rectangle to check.</Parameter>
 		</Function>
-		<Function Name="mp_grid_create" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="mp_grid_create" Deprecated="false" ReturnType="Id.MpGrid" Pure="false">
 			<Description>With this function you can create an mp_grid for the motion planning functions. It returns an index that should be stored in a variable for use in all the other MP grid function calls. The x and y coordinates indicate the position of the top-left corner of the grid, hcells and vcells indicate the number of horizontal and vertical cells to be created within the grid, and cell width and cell height indicate the size of the cells in pixels. You can create and maintain multiple grid structures at the same moment if you need them for different things, but be aware that each grid will require memeory, and the more cells they have the more memory they will require. Also note that the MP functions are quite processor heavy to use so the more often you call them and the higher the cell resolution then the more likely you are to have a drop in performance.</Description>
 			<Parameter Name="left" Type="Real" Optional="false">Starting x coordinate of the mp_grid in the room</Parameter>
 			<Parameter Name="top" Type="Real" Optional="false">Starting y coordinate of the mp_grid in the room</Parameter>
@@ -7767,7 +7800,7 @@
 		</Function>
 		<Function Name="mp_potential_path" Deprecated="false" ReturnType="Bool" Pure="false">
 			<Description>This function computes a path for the instance from its current position and orientation to the position specified by the xgoal,ygoal arguments. It uses the indicated step size while trying to avoid collision with either all instances or only those flagged as solid. Like in the function mp_potential_step() it uses potential field steps to accomplish this and the manner in which it does this can be modified through the function mp_potential_settings(). The indicated path must already exist and it will be overwritten by the new path. The function will return whether a path was found (true) or not (false).</Description>
-			<Parameter Name="path" Type="Id.MpGrid" Optional="false">index of the path that is to be used by the function</Parameter>
+			<Parameter Name="path" Type="Asset.GMPath" Optional="false">index of the path that is to be used by the function</Parameter>
 			<Parameter Name="xgoal" Type="Real" Optional="false">The target x position.</Parameter>
 			<Parameter Name="ygoal" Type="Real" Optional="false">The target y position.</Parameter>
 			<Parameter Name="stepsize" Type="Real" Optional="false">The speed the instance moves in pixels per step.</Parameter>
@@ -7904,23 +7937,23 @@
 			<Parameter Name="url" Type="String" Optional="false">The URL or IP to connect to (a string).</Parameter>
 			<Parameter Name="port" Type="Real" Optional="false">The port to connect to.</Parameter>
 		</Function>
-		<Function Name="network_create_server" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="network_create_server" Deprecated="false" ReturnType="Real" Pure="false">
 			<Description>This function is used to create a new network server for your game, using one of the permitted connection protocols (see the constants listed below). You supply the server type, then give it a port to use, and finally the number of maximum connections that should be permitted at any one time to the server (note that this number is up to you, but too many connected clients will saturate the network or the device CPU won&apos;t be able to handle the processing of that number of players, so use with care). The function returns a unique id which should be used stored in a variable and used to identify the server in all further network functions, or a value of less than 0 if the connection fails.</Description>
 			<Parameter Name="type" Type="Constant.SocketType" Optional="false">The type of server to create (see the constants listed below).</Parameter>
 			<Parameter Name="port" Type="Real" Optional="false">The port that the server will use.</Parameter>
 			<Parameter Name="max_client" Type="Real" Optional="false">The maximum number of clients that can connect at once.</Parameter>
 		</Function>
-		<Function Name="network_create_server_raw" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="network_create_server_raw" Deprecated="false" ReturnType="Real" Pure="false">
 			<Description>This function is used to create a new network server for your game, using one of the permitted connection protocols (see the constants listed below). You supply the server type, then give it a port to use, and finally the number of maximum connections that should be permitted at any one time to the server (note that this number is up to you, but too many connected clients will saturate the network or the device CPU won&apos;t be able to handle the processing of that number of players, so use with care). The function returns a unique id which should be used stored in a variable and used to identify the server in all further network functions, or a value of less than 0 if the connection fails.</Description>
 			<Parameter Name="type" Type="Constant.SocketType" Optional="false">The type of server to create (see the constants listed below).</Parameter>
 			<Parameter Name="port" Type="Real" Optional="false">The port that the server will use.</Parameter>
 			<Parameter Name="max_client" Type="Real" Optional="false">The maximum number of clients that can connect at once.</Parameter>
 		</Function>
-		<Function Name="network_create_socket" Deprecated="false" ReturnType="Id.Socket" Pure="true">
+		<Function Name="network_create_socket" Deprecated="false" ReturnType="Id.Socket" Pure="false">
 			<Description>This function is used to create a new client socket for your game to communicate over the network. You must define the socket type (see the list of constants below) and the function will return a unique id for that socket, which should be used in all further function calls for that socket, or a value of less than 0 if the connection fails.</Description>
 			<Parameter Name="type" Type="Constant.SocketType" Optional="false">The type of socket connection to create (see the constants listed below).</Parameter>
 		</Function>
-		<Function Name="network_create_socket_ext" Deprecated="false" ReturnType="Id.Socket" Pure="true">
+		<Function Name="network_create_socket_ext" Deprecated="false" ReturnType="Id.Socket" Pure="false">
 			<Description>This function is used to create a new client socket for your game to communicate over the network. You must define the socket protocol (see the list of constants below) and give a port to use, and the function will return a unique id which should be used in all further function calls for that socket, or a value of less than 0 if the connection fails.</Description>
 			<Parameter Name="protocol" Type="Constant.SocketType" Optional="false">The network protocol to use</Parameter>
 			<Parameter Name="port" Type="Real" Optional="false">The port to use</Parameter>
@@ -8093,7 +8126,7 @@
 			<Parameter Name="xoffset" Type="Real" Optional="false">the offset along the x-axis</Parameter>
 			<Parameter Name="yoffset" Type="Real" Optional="false">the offset along the y-axis</Parameter>
 		</Function>
-		<Function Name="physics_fixture_create" Deprecated="false" ReturnType="Id.PhysicsIndex" Pure="true">
+		<Function Name="physics_fixture_create" Deprecated="false" ReturnType="Id.PhysicsIndex" Pure="false">
 			<Description>The first step in setting up a fixture is creating it with this function. The returning index should be stored in a variable to be used in all further functions that are used to define and use this fixture.</Description>
 		</Function>
 		<Function Name="physics_fixture_delete" Deprecated="false" ReturnType="Undefined" Pure="false">
@@ -8240,7 +8273,7 @@
 			<Description>Once two instances with physics representations have been bound by a joint, this can be deleted again at any time. Normally this will happen automatically when one of the two instances is destroyed, or when the room ends, but there are times when you may wish to do this manually. In those cases you would use this function.</Description>
 			<Parameter Name="joint" Type="Id.PhysicsIndex" Optional="false">The index of the joint that you wish to delete</Parameter>
 		</Function>
-		<Function Name="physics_joint_distance_create" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="physics_joint_distance_create" Deprecated="false" ReturnType="Id.PhysicsIndex" Pure="false">
 			<Description>One of the simplest joint is a distance joint which says that the distance between two points on two instances must be constant. When you specify a distance joint the two instances should already be created and have a fixture assigned, then you define the two anchor points in room coordinates. The first anchor point is connected to instance 1, the second anchor point is connected to instance 2 and the distance between these points imply the length of the distance constrain. The image below shows how this works:</Description>
 			<Parameter Name="inst1" Type="Id.Instance" Optional="false">The first instance to connect with the joint</Parameter>
 			<Parameter Name="inst2" Type="Id.Instance" Optional="false">The second instance to connect with the joint</Parameter>
@@ -8255,7 +8288,7 @@
 			<Parameter Name="joint" Type="Id.PhysicsIndex" Optional="false">The joint that you wish to enable or disable the motor on</Parameter>
 			<Parameter Name="motor" Type="Bool" Optional="false">Whether you wish to turn the motor on (true) or off (false)</Parameter>
 		</Function>
-		<Function Name="physics_joint_friction_create" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="physics_joint_friction_create" Deprecated="false" ReturnType="Id.PhysicsIndex" Pure="false">
 			<Description>The friction joint is a bit different to all other joints in the physics simulation in that the connection created will not constrain the instances position or movement, but rather its speed and rotation. This works by taking the maximum input values for force and torque and applying those to the second fixture to bring the speed and angular momentum down to the same values as that of the first instance. So, if you have a stationary instance and a moving instance then connect them with a friction joint, the moving instance will gradually slow down until it too is stationary. If both instances were moving then the second instance will have its movement speed modified to match that of the first instance.</Description>
 			<Parameter Name="inst1" Type="Id.Instance" Optional="false">The first instance to connect with the joint</Parameter>
 			<Parameter Name="inst2" Type="Id.Instance" Optional="false">The second instance to connect with the joint</Parameter>
@@ -8265,7 +8298,7 @@
 			<Parameter Name="max_torque" Type="Real" Optional="false">The maximum rotational force that will be applied</Parameter>
 			<Parameter Name="col" Type="Bool" Optional="false">Whether the two instances can collide (true) or not (false)</Parameter>
 		</Function>
-		<Function Name="physics_joint_gear_create" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="physics_joint_gear_create" Deprecated="false" ReturnType="Id.PhysicsIndex" Pure="false">
 			<Description>If you want to create a sophisticated mechanical contraption you might want to use gears. In principle you can create gears in GameMaker by using compounding instances to model gear teeth, but this is not very efficient and might be tedious to author! Thankfully there is a simpler method, and that is to use a gear joint. To make one you need to have previously defined your fixtures and created the two basic joints that are going to comprise your gear - these must be made up of one revolute joint and either a prismatic joint or another revolute joint. The image below shows how a gear would typically be created in a game:</Description>
 			<Parameter Name="inst1" Type="Id.Instance" Optional="false">The first instance to connect with the joint</Parameter>
 			<Parameter Name="inst2" Type="Id.Instance" Optional="false">The second instance to connect with the joint</Parameter>
@@ -8278,7 +8311,7 @@
 			<Parameter Name="joint" Type="Id.PhysicsIndex" Optional="false">The index of the joint that you wish to test</Parameter>
 			<Parameter Name="value" Type="Constant.PhysicsJointProperty" Optional="false">The constant for the joint property that you wish to test</Parameter>
 		</Function>
-		<Function Name="physics_joint_prismatic_create" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="physics_joint_prismatic_create" Deprecated="false" ReturnType="Id.PhysicsIndex" Pure="false">
 			<Description>Like a revolute joint, the prismatic joint only has one degree of freedom, but with this joint it is directional relative to an axis rather than rotational and actually prevents any form of rotation. Here is an image to help you visualise how this works:</Description>
 			<Parameter Name="inst1" Type="Id.Instance" Optional="false">The first instance to connect with the joint</Parameter>
 			<Parameter Name="inst2" Type="Id.Instance" Optional="false">The second instance to connect with the joint</Parameter>
@@ -8294,7 +8327,7 @@
 			<Parameter Name="motor" Type="Bool" Optional="false">Whether the motor should be active (true) or not (false)</Parameter>
 			<Parameter Name="col" Type="Bool" Optional="false">Whether the two instances can collide (true) or not (false)</Parameter>
 		</Function>
-		<Function Name="physics_joint_pulley_create" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="physics_joint_pulley_create" Deprecated="false" ReturnType="Id.PhysicsIndex" Pure="false">
 			<Description>The pulley joint is used to connect two instances within the physics world in such a way that moving one will directly influence the movement of the other. These joints are first anchored in the world space at two points, each one connected to an instance at its center of mass. This can be changed by setting the local anchor x/y coordinates relative to the origin of the instance, meaning that the actual connection from the instance to the physics world anchor point can be offset somewhere other than its origin. The following image illustrates this:</Description>
 			<Parameter Name="inst1" Type="Id.Instance" Optional="false">The first instance to connect with the joint</Parameter>
 			<Parameter Name="inst2" Type="Id.Instance" Optional="false">The second instance to connect with the joint</Parameter>
@@ -8309,7 +8342,7 @@
 			<Parameter Name="ratio" Type="Id.Instance" Optional="false">Set the velocity ratio between two instances</Parameter>
 			<Parameter Name="col" Type="Bool" Optional="false">Whether the two instances can collide (true) or not (false)</Parameter>
 		</Function>
-		<Function Name="physics_joint_revolute_create" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="physics_joint_revolute_create" Deprecated="false" ReturnType="Id.PhysicsIndex" Pure="false">
 			<Description>A revolute joint forces two bodies to share a common anchor point (often called a hinge point) and the joint has a single degree of freedom - the relative rotation of the two bodies around this point. To specify a revolute you need to provide two instances and a single anchor point in the room, as you can see in the image provided:</Description>
 			<Parameter Name="inst1" Type="Id.Instance" Optional="false">The first instance to connect with the joint</Parameter>
 			<Parameter Name="inst2" Type="Id.Instance" Optional="false">The second instance to connect with the joint</Parameter>
@@ -8323,7 +8356,7 @@
 			<Parameter Name="motor" Type="Bool" Optional="false">Whether the motor should be active (true) or not (false)</Parameter>
 			<Parameter Name="col" Type="Bool" Optional="false">Whether the two instances can collide (true) or not (false)</Parameter>
 		</Function>
-		<Function Name="physics_joint_rope_create" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="physics_joint_rope_create" Deprecated="false" ReturnType="Id.PhysicsIndex" Pure="false">
 			<Description>A rope joint is one which is used to join two instances that you want to keep a constant distance apart, no matter what other forces are acting on it. With a distance joint, you can get &quot;joint stretching&quot; where the two fixtures will separate and behave strangely should too much stress be put on the joint, however the rope joint does not do this and will not stretch any further than the maximum defined length. When you create a rope joint the two instances should already be created and have a fixture assigned, then you define the two anchor points in room coordinates. The first anchor point is connected to instance 1, the second anchor point is connected to instance 2 and the distance and the maxlength argument sets the maximum length constraint on the joint. The image below shows how this works:</Description>
 			<Parameter Name="inst1" Type="Id.Instance" Optional="false">The first instance to connect with the joint</Parameter>
 			<Parameter Name="inst2" Type="Id.Instance" Optional="false">The second instance to connect with the joint</Parameter>
@@ -8340,7 +8373,7 @@
 			<Parameter Name="field" Type="Constant.PhysicsJointProperty" Optional="false">The constant for the joint property that you wish to change</Parameter>
 			<Parameter Name="value" Type="Any" Optional="false">The new value for the joint property</Parameter>
 		</Function>
-		<Function Name="physics_joint_weld_create" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="physics_joint_weld_create" Deprecated="false" ReturnType="Id.PhysicsIndex" Pure="false">
 			<Description>The weld joint is designed to attach two fixtures together in a strong, yet flexible bond. The weld joint will permit flexing between the two joined fixtures but without the stretching associated with, for example, a distance joint, and will always try to &quot;spring&quot; back to the reference angle when put under any stress or load. You define the point in the room where the joint should be created, as well as the angle that you wish the joint to try and maintain at all times, as shown in the image below:</Description>
 			<Parameter Name="inst1" Type="Id.Instance" Optional="false">The first instance to connect with the joint</Parameter>
 			<Parameter Name="inst2" Type="Id.Instance" Optional="false">The second instance to connect with the joint</Parameter>
@@ -8351,7 +8384,7 @@
 			<Parameter Name="damping_ratio" Type="Real" Optional="false">This damping ratio for the joint</Parameter>
 			<Parameter Name="col" Type="Bool" Optional="false">Whether the two instances can collide (true) or not (false)</Parameter>
 		</Function>
-		<Function Name="physics_joint_wheel_create" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="physics_joint_wheel_create" Deprecated="false" ReturnType="Id.PhysicsIndex" Pure="false">
 			<Description>A wheel joint simply combines a piston and a revolute joint, like a wheel mounted on the shock absorber of a car. You specify the anchor point for the joint well as the two physics enabled instances to joint, and the first instance will act as the &quot;body&quot; for the joint, while the second will be the &quot;wheel&quot;, and be permitted to move freely around the joint axis. You can also set an axis vector, which is the imaginary line along which the joint will act as a &quot;spring&quot; permitting the wheel to bounce up and down along it as it encounters obstacles (much like the piston joint). The following image illustrates this:</Description>
 			<Parameter Name="inst1" Type="Id.Instance" Optional="false">The first instance to connect with the joint</Parameter>
 			<Parameter Name="inst2" Type="Id.Instance" Optional="false">The second instance to connect with the joint</Parameter>
@@ -8369,7 +8402,7 @@
 		<Function Name="physics_particle_count" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>This function will return the number of particles that are active in a physics enabled room.</Description>
 		</Function>
-		<Function Name="physics_particle_create" Deprecated="false" ReturnType="Real" Pure="true">
+		<Function Name="physics_particle_create" Deprecated="false" ReturnType="Id.PhysicsIndex" Pure="false">
 			<Description>With this function you can create a single particle anywhere within your game room, setting certain flags and properties. The &quot;flags&quot; are the return value of a combination of the following constants:</Description>
 			<Parameter Name="flags" Type="Constant.PhysicsParticleFlag" Optional="false">The flags to set on the particle.</Parameter>
 			<Parameter Name="x" Type="Real" Optional="false">The x position to create the particle at.</Parameter>
@@ -8382,7 +8415,7 @@
 		</Function>
 		<Function Name="physics_particle_delete" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can delete (remove) a particle from the physics simulation in the current room. The function takes the unique ID of the particle to delete, as returned by the function physics_particle_create().</Description>
-			<Parameter Name="ind" Type="Real" Optional="false">The index (ID) of the particle to delete.</Parameter>
+			<Parameter Name="ind" Type="Id.PhysicsIndex" Optional="false">The index (ID) of the particle to delete.</Parameter>
 		</Function>
 		<Function Name="physics_particle_delete_region_box" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can delete (remove) all the particles that fall within the bounds of the defined rectangular area from the physics simulation in the current room. The function takes the x and y position for the center of the area to delete as well as the half width and height of the rectangle (in pixels) which defines the area.</Description>
@@ -8755,7 +8788,7 @@
 			<Parameter Name="substr" Type="String" Optional="false">The substring within the string to be replaced in all instances.</Parameter>
 			<Parameter Name="newstr" Type="String" Optional="false">The new substring to replace the previous one(s).</Parameter>
 		</Function>
-		<Function Name="string_set_byte_at" Deprecated="false" ReturnType="String" Pure="true">
+		<Function Name="string_set_byte_at" Deprecated="false" ReturnType="String" Pure="false">
 			<Description>This function sets a byte directly in a string (based on the UTF8 format) and returns a copy of the string with the changes.</Description>
 			<Parameter Name="str" Type="String" Optional="false">The string to change the byte of.</Parameter>
 			<Parameter Name="pos" Type="Real" Optional="false">The position within the string (starting at 1) to change the byte of.</Parameter>
@@ -8881,7 +8914,7 @@
 			<Description>With this function you can insert a value (or values) into an array at any given position. The function requires you to provide a variable that holds the array, the index (position) in the array to insert at, as well as at least one value to insert, although you can optionally provide further arguments and they will all be inserted into the array in consecutive order from the given index.</Description>
 			<Parameter Name="array" Type="Array" Coerce="true" Optional="false">The variable that holds the array.</Parameter>
 			<Parameter Name="index" Type="Real" Optional="false">The index (position) in the array to insert the value(s) </Parameter>
-			<Parameter Name="..." Type="ArgumentIdentity" Optional="true">The value to insert</Parameter>
+			<Parameter Name="..." Type="ArgumentIdentity" Optional="false">The value to insert</Parameter>
 		</Function>
 		<Function Name="array_length" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>With this function you can get the length (number of entries) of an array dimension. You supply the array index value and the function will return an integer value representing the number of entries the array contains. This function can also be used for multi-dimension arrays, as long as you specify which dimension you want to get the length of when you supply the array index, following this pattern:</Description>
@@ -8894,7 +8927,7 @@
 		<Function Name="array_push" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can push a value (or values) onto the end of an array without having to know the length of the array. The function requires you to provide a variable that holds the array as well as at least one value to push, although you can optionally provide further arguments and they will all be pushed onto the array in consecutive order.</Description>
 			<Parameter Name="array" Type="Array" Coerce="true" Optional="false">The variable that holds the array.</Parameter>
-			<Parameter Name="..." Type="ArgumentIdentity" Optional="true">The value to push onto the end of the array</Parameter>
+			<Parameter Name="..." Type="ArgumentIdentity" Optional="false">The value to push onto the end of the array</Parameter>
 		</Function>
 		<Function Name="array_resize" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can resize an existing array dimension to a new size. You supply the array to be resized as well as the new number of indices for the array, and the function will resize that array. Note that this function is designed for resizing an array down to a smaller length as you can resize up by simply setting a new index in the array. That said, if you do use it to size up an array, any new indices will be set to the default value of 0.</Description>
@@ -9061,20 +9094,17 @@
 		<Function Name="array_concat" Deprecated="false" ReturnType="Array" Pure="true">
 			<Description>With this function you can concatenate two or more arrays into a single one.</Description>
 			<Parameter Name="array0" Type="Array" Optional="false">The variable that holds the first array.</Parameter>
-			<Parameter Name="array1" Type="Array" Optional="false">The variable that holds the second array.</Parameter>
-			<Parameter Name="..." Type="Array" Optional="true">The variable that holds the nth array.</Parameter>
+			<Parameter Name="..." Type="Array" Optional="false">The variable that holds the nth array.</Parameter>
 		</Function>
 		<Function Name="array_union" Deprecated="false" ReturnType="Array" Pure="true">
 			<Description>With this function you can join two or more arrays into a single one, removing the duplicates</Description>
 			<Parameter Name="array0" Type="Array" Optional="false">The variable that holds the first array.</Parameter>
-			<Parameter Name="array1" Type="Array" Optional="false">The variable that holds the second array.</Parameter>
-			<Parameter Name="..." Type="Array" Optional="true">The variable that holds the nth array.</Parameter>
+			<Parameter Name="..." Type="Array" Optional="false">The variable that holds the nth array.</Parameter>
 		</Function>
 		<Function Name="array_intersection" Deprecated="false" ReturnType="Array" Pure="true">
 			<Description>With this function you can create an array of elements common to all the input arrays, removing duplicates.</Description>
 			<Parameter Name="array0" Type="Array" Optional="false">The variable that holds the first array.</Parameter>
-			<Parameter Name="array1" Type="Array" Optional="false">The variable that holds the second array.</Parameter>
-			<Parameter Name="..." Type="Array" Optional="true">The variable that holds the nth array.</Parameter>
+			<Parameter Name="..." Type="Array" Optional="false">The variable that holds the nth array.</Parameter>
 		</Function>
 		<Function Name="bool" Deprecated="false" ReturnType="Bool" Pure="true">
 			<Description>This function will attempt to convert a given value into a boolean data type, where the value will be returned as true if it is greater than 0.5 and false otherwise.</Description>
@@ -9182,6 +9212,10 @@
 		<Function Name="ptr" Deprecated="false" ReturnType="Pointer" Pure="true">
 			<Description>This function will attempt to convert a given value into a pointer data type, where the value must be either a real, a string, an int64, an int32, or a ptr. Anything else will cause the game to crash with an error message.</Description>
 			<Parameter Name="n" Type="Any" Optional="false">The value to convert.</Parameter>
+		</Function>
+		<Function Name="handle_parse" Deprecated="false" ReturnType="Asset" Pure="true">
+			<Description>This function will attempt to convert a string into a handle data type, to be used when a handle has been converted to a string and you want to convert it back. Note: No validation is done on the value returned so it is not guaranteed to be valid.</Description>
+			<Parameter Name="value_string" Type="String" Optional="false">The string to convert.</Parameter>
 		</Function>
 		<Function Name="typeof" Deprecated="false" ReturnType="String" Pure="true">
 			<Description>This function returns the data type of any given variable as a string. The possible return values are listed in the table below:</Description>
@@ -9935,7 +9969,7 @@
 			<Parameter Name="propertyName" Type="Any" Optional="false" />
 			<Parameter Name="newValue" Type="Any" Optional="false" />
 		</Function>
-		<Function Name="win8_settingscharm_get_xaml_property" Deprecated="true" ReturnType="Undefined" Pure="false">
+		<Function Name="win8_settingscharm_get_xaml_property" Deprecated="true" ReturnType="Undefined" Pure="true">
 			<Parameter Name="entryName" Type="Any" Optional="false" />
 			<Parameter Name="elementName" Type="Any" Optional="false" />
 			<Parameter Name="propertyName" Type="Any" Optional="false" />
@@ -10154,7 +10188,7 @@
 			<Parameter Name="colour" Type="Constant.Color" Optional="false">The colour to set, either an integer, a constant, or a hex value.</Parameter>
 			<Parameter Name="alpha" Type="Real" Optional="false">The alpha to set from 0 to 1.</Parameter>
 		</Function>
-		<Function Name="skeleton_slot_color_get" Deprecated="false" ReturnType="Real" Locale="US" Pure="false">
+		<Function Name="skeleton_slot_color_get" Deprecated="false" ReturnType="Real" Locale="US" Pure="true">
 			<Description>With this function you can get an attachment slot colour. You supply the slot name (a string) and the function will return an integer value for the colour.</Description>
 			<Parameter Name="slot" Type="String" Optional="false">The slot name to check, a string</Parameter>
 		</Function>
@@ -10175,7 +10209,7 @@
 			<Parameter Name="layer_id" Type="String,Id.Layer" Optional="false" />
 			<Parameter Name="tile_element_id" Type="Id.TileMapElement" Optional="false" />
 		</Function>
-		<Function Name="layer_tile_create" Deprecated="true" ReturnType="Id.TileElementId" Pure="true">
+		<Function Name="layer_tile_create" Deprecated="true" ReturnType="Id.TileElementId" Pure="false">
 			<Parameter Name="layer_id" Type="String,Id.Layer" Optional="false" />
 			<Parameter Name="x" Type="Real" Optional="false" />
 			<Parameter Name="y" Type="Real" Optional="false" />
@@ -10308,20 +10342,20 @@
 			<Description>This function is used to create a new FX Struct for a given effect type, which contains information on the effect and the values for its parameters.</Description>
 			<Parameter Name="filter_or_effect_name" Type="String" Optional="false">The name of the filter/effect to create (as a string).</Parameter>
 		</Function>
-		<Function Name="fx_get_name" Deprecated="false" ReturnType="String" Pure="false">
+		<Function Name="fx_get_name" Deprecated="false" ReturnType="String" Pure="true">
 			<Description>This function is used to retrieve the name of a filter/effect from its struct.</Description>
 			<Parameter Name="filter_or_effect" Type="Struct.Fx" Optional="false">The FX struct to get the name of</Parameter>
 		</Function>
-		<Function Name="fx_get_parameter_names" Deprecated="false" ReturnType="Array[String]" Pure="false">
+		<Function Name="fx_get_parameter_names" Deprecated="false" ReturnType="Array[String]" Pure="true">
 			<Description>This function is used to retrieve the name of a filter/effect from its struct.</Description>
 			<Parameter Name="filter_or_effect" Type="Struct.Fx" Optional="false">The FX struct to get the parameter names of</Parameter>
 		</Function>
-		<Function Name="fx_get_parameter" Deprecated="false" ReturnType="Any" Pure="false">
+		<Function Name="fx_get_parameter" Deprecated="false" ReturnType="Any" Pure="true">
 			<Description>This function is used to retrieve the value of a parameter from an FX Struct.</Description>
 			<Parameter Name="filter_or_effect" Type="Struct.Fx" Optional="false">The FX struct to get the parameter from</Parameter>
 			<Parameter Name="parameter_name" Type="String" Optional="false">The FX struct to get the parameter from</Parameter>
 		</Function>
-		<Function Name="fx_get_parameters" Deprecated="false" ReturnType="Struct" Pure="false">
+		<Function Name="fx_get_parameters" Deprecated="false" ReturnType="Struct" Pure="true">
 			<Description>This function is used to retrieve a struct containing all the parameters for the given FX struct.</Description>
 			<Parameter Name="filter_or_effect" Type="Struct.Fx" Optional="false">The FX struct to get the parameter from</Parameter>
 		</Function>
@@ -10350,7 +10384,7 @@
 			<Parameter Name="layer_name_or_id" Type="String,Id.Layer" Optional="false">The name or ID of the layer to modify</Parameter>
 			<Parameter Name="filter_or_effect" Type="Struct.Fx" Optional="false">The FX struct to modify</Parameter>
 		</Function>
-		<Function Name="layer_get_fx" Deprecated="false" ReturnType="Struct.Fx" Pure="false">
+		<Function Name="layer_get_fx" Deprecated="false" ReturnType="Struct.Fx" Pure="true">
 			<Description>This function is used to retrieve the FX struct for a layer.</Description>
 			<Parameter Name="layer_name_or_id" Type="String,Id.Layer" Optional="false">The name or ID of the layer to modify</Parameter>
 		</Function>
@@ -10408,7 +10442,7 @@
 		<Function Name="rollback_leave_game" Deprecated="false" ReturnType="Undefined" Pure="false" FeatureFlag="rollback">
 			<Description>This function leaves the current game.</Description>
 		</Function>
-		<Function Name="rollback_get_input" Deprecated="false" ReturnType="Struct" Pure="false" FeatureFlag="rollback">
+		<Function Name="rollback_get_input" Deprecated="false" ReturnType="Struct" Pure="true" FeatureFlag="rollback">
 			<Description>This function returns a struct containing fields w,a,s,d,z,x,c,space,up,left,down,right and the corresponding last_? fields for last frames input.</Description>
 			<Parameter Name="player_id" Type="Real" Optional="true">The player id to get the input for</Parameter>
 		</Function>
@@ -10425,11 +10459,11 @@
 			<Description>This function is used to update the local player preferences. Preferences can only be set after joining or creating a game, but before starting the game.</Description>
 			<Parameter Name="default" Type="Any" Optional="false">Player preferences</Parameter>
 		</Function>
-		<Function Name="rollback_get_player_prefs" Deprecated="false" ReturnType="Any" Pure="false" FeatureFlag="rollback">
+		<Function Name="rollback_get_player_prefs" Deprecated="false" ReturnType="Any" Pure="true" FeatureFlag="rollback">
 			<Description>This function is used to get the preferences for a given player. Undefined will be returned if no preferences have been set. If the player id argument is not given, the preferences for the local player will be returned.</Description>
 			<Parameter Name="player id" Type="Real" Optional="true">Player id</Parameter>
 		</Function>
-		<Function Name="rollback_get_info" Deprecated="false" ReturnType="Struct" Pure="false" FeatureFlag="rollback">
+		<Function Name="rollback_get_info" Deprecated="false" ReturnType="Struct" Pure="true" FeatureFlag="rollback">
 			<Description>This function returns a struct containing player_name and avatar_url for the player.</Description>
 			<Parameter Name="player_id" Type="Real" Optional="true">The player id to get the info for</Parameter>
 		</Function>
@@ -10452,7 +10486,7 @@
 			<Parameter Name="default" Type="Any" Optional="false">Subscriptions</Parameter>
 			<Description>Set subscriptions for live wallpaper</Description>
 		</Function>
-		<Function Name="time_source_create" Deprecated="false" ReturnType="Id.TimeSource" Pure="true">
+		<Function Name="time_source_create" Deprecated="false" ReturnType="Id.TimeSource" Pure="false">
 			<Description>Creates a new time source, returning its index.</Description>
 			<Parameter Name="parent" Type="Id.TimeSource,Constant.TimeSource" Optional="false">The parent of the time source</Parameter>
 			<Parameter Name="period" Type="Real" Optional="false">The period of the time source</Parameter>
@@ -10552,7 +10586,7 @@
 			<Description>Cancels a delayed call set up by call_later.</Description>
 			<Parameter Name="handle" Type="Id.TimeSource" Optional="false">The handle of the call to cancel</Parameter>
 		</Function>
-		<Function Name="surface_get_format" Deprecated="false" ReturnType="Constant.SurfaceFormatType" Pure="false">
+		<Function Name="surface_get_format" Deprecated="false" ReturnType="Constant.SurfaceFormatType" Pure="true">
 			<Description>This function returns the format of the given surface. All formats are listed in our manual.</Description>
 			<Parameter Name="surface_id" Type="Id.Surface" Optional="false">The ID of the surface to get the format of</Parameter>
 		</Function>	
@@ -10904,6 +10938,7 @@
 		<Constant Name="tile_index_mask" Class="TileMask" Type="Real" Deprecated="false">A special constant that is for &quot;and&quot;-ing with the tile data blob to extract the tile index.</Constant>
 		<Constant Name="seqtracktype_graphic" Class="SequenceTrackType" Type="Real" Deprecated="false">This is a graphics (sprite) asset track.</Constant>
 		<Constant Name="seqtracktype_audio" Class="SequenceTrackType" Type="Real" Deprecated="false">This is an audio asset track.</Constant>
+		<Constant Name="seqtracktype_audioeffect" Class="SequenceTrackType" Type="Real" Deprecated="false">This is an audio effect parameter track.</Constant>
 		<Constant Name="seqtracktype_instance" Class="SequenceTrackType" Type="Real" Deprecated="false">This is an instance asset track.</Constant>
 		<Constant Name="seqtracktype_sequence" Class="SequenceTrackType" Type="Real" Deprecated="false">This is a sequence asset track.</Constant>
 		<Constant Name="seqtracktype_clipmask" Class="SequenceTrackType" Type="Real" Deprecated="false">This is a clip mask group asset track.</Constant>
@@ -11338,6 +11373,7 @@
 		<Constant Name="GM_runtime_version" Type="String" Deprecated="false" />
 		<Constant Name="GM_project_filename" Type="String" Deprecated="false">full path and filename of the YYP project</Constant>
 		<Constant Name="GM_build_type" Type="String" Deprecated="false">compile time constant of current build type either "exe" (for create executable) or "run" (for a run)</Constant>
+		<Constant Name="GM_is_sandboxed" Type="Bool" Deprecated="false">compile time constant of whether game is sandboxed or not (true - sandbox is on, false - sandbox is off)</Constant>		
 		<Constant Name="_GMLINE_" Type="Real" Deprecated="false">compile time constant that returns the current line number</Constant>
 		<Constant Name="_GMFUNCTION_" Type="String" Deprecated="false">compile time constant that returns the current function name</Constant>
 		<Constant Name="_GMFILE_" Type="String" Deprecated="false">compile time constant that returns the current filename</Constant>
