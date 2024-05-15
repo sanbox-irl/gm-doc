@@ -2044,6 +2044,8 @@
 		<Function Name="skeleton_animation_clear" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function will clear the specified animation track of all animations, ready to be re-assigned.</Description>
 			<Parameter Name="track" Type="Real" Optional="false">The animation track to clear.</Parameter>
+			<Parameter Name="reset" Type="Bool" Optional="true">Whether to reset the skeleton to setup pose (defaults to false).</Parameter>
+			<Parameter Name="track" Type="Real" Optional="true">How long animating the skeleton back to setup pose will take.</Parameter>
 		</Function>
 		<Function Name="skeleton_animation_get" Deprecated="false" ReturnType="String" Pure="true">
 			<Description>With this function you can get the current animation set being used by your skeletal animation sprite. The return value is a string, which will be the name of the set as you defined it in your skeletal animation program.</Description>
@@ -2933,7 +2935,7 @@
 			<Parameter Name="type" Type="Constant.BufferDataType" Optional="false">The type of data that is to be read from the buffer (see the list of constants here).</Parameter>
 		</Function>
 		<Function Name="buffer_poke" Deprecated="false" ReturnType="Undefined" Pure="false">
-			<Description>With the buffer_write() function, you can write data to the given buffer at the current &quot;seek&quot; position, with each piece of data advancing this position by the bytes being written or read. However, it may be necessary for you to change a given piece of data without wanting to change the current seek position, and that&apos;s when you would use this function. You simply supply the function with a buffer index, and then the offset position from the buffer start (in bytes) within that buffer to write to, as well as the data type and the value to be written.</Description>
+			<Description>With this function you can write data into a buffer at the specified offset, without changing the seek position. This is different from buffer_write(), which uses the current seek position as the offset and advances that with the amount of bytes written.</Description>
 			<Parameter Name="buffer" Type="Id.Buffer" Optional="false">The index of the buffer to use.</Parameter>
 			<Parameter Name="offset" Type="Real" Optional="false">The offset position (in bytes) within the buffer to write the given data to.</Parameter>
 			<Parameter Name="type" Type="Constant.BufferDataType" Optional="false">The type of data that is to be written to the buffer (see the list of constants here).</Parameter>
@@ -3012,7 +3014,7 @@
 			<Description>Dots per inch (DPI) is a measure of spatial printing or video dot density, in particular the number of individual dots that can be placed in a line within the span of 1 inch (2.54 cm). When working on mobile devices (in particular Android devices) this is an important factor to take into consideration as what may be appropriate for one display resolution, may not be appropriate for another. For example, you may have two displays with the same resolution of 400 x 800, but display 1 has a dpi of 60 and display 2 has a dpi of 30. In this case, any text or image displayed on display 2 will appear much larger, even though the actual resolution is the same.</Description>
 		</Function>
 		<Function Name="display_get_gui_width" Deprecated="false" ReturnType="Real" Pure="true">
-			<Description>With this function you can get the height (in pixels) of the GUI as used in the Draw GUI Event.</Description>
+			<Description>With this function you can get the width (in pixels) of the GUI as used in the Draw GUI Event.</Description>
 		</Function>
 		<Function Name="display_get_height" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>This function will return the height of the display (in pixels). Note that on the HTML5 target, this value is the height of the browser window, rather than the physical display size.</Description>
@@ -4242,11 +4244,19 @@
 			<Parameter Name="open" Type="Bool" Optional="true">true if section is open when created, false if closed, defaults to true</Parameter>
 		</Function>
 		<Function Name="dbg_view_delete" Deprecated="false" ReturnType="Undefined" Pure="false">
-			<Description>Declare a new debug view that can be accessed from the debug overlay.</Description>
+			<Description>Delete a dbg_view that has been previously been created.</Description>
+			<Parameter Name="view" Type="Pointer.View" Optional="false">handle to the view</Parameter>
+		</Function>
+		<Function Name="dbg_view_exists" Deprecated="false" ReturnType="Bool" Pure="false">
+			<Description>Check to see if a dbg_view still exists.</Description>
 			<Parameter Name="view" Type="Pointer.View" Optional="false">handle to the view</Parameter>
 		</Function>
 		<Function Name="dbg_section_delete" Deprecated="false" ReturnType="Undefined" Pure="false">
-			<Description>Declare a new debug section this will be added to the current debug view that is active. NOTE: if no debug view is active then a "Default" view is created for you.</Description>
+			<Description>Delete a dbg_section that has previously been created.</Description>
+			<Parameter Name="section" Type="Pointer.Section" Optional="false">handle to the section</Parameter>
+		</Function>
+		<Function Name="dbg_section_exists" Deprecated="false" ReturnType="Bool" Pure="false">
+			<Description>Check to see if a dbg_section still exists</Description>
 			<Parameter Name="section" Type="Pointer.Section" Optional="false">handle to the section</Parameter>
 		</Function>
 		<Function Name="dbg_slider" Deprecated="false" ReturnType="Undefined" Pure="false">
@@ -4658,6 +4668,12 @@
 		<Function Name="gpu_get_blendmode_srcalpha" Deprecated="false" ReturnType="Constant.BlendModeFactor" Pure="true">
 			<Description>This function can be used to retrieve the current source extended blend mode alpha factor. The value returned will be one of the following constants (&quot;s&quot; denotes a value taken from the source while a &quot;d&quot; denotes a value from the destination) with only the &quot;A&quot; component being used when drawing:</Description>
 		</Function>
+		<Function Name="gpu_get_blendequation" Deprecated="false" ReturnType="Constant.BlendModeEquation" Pure="true">
+			<Description>This function can be used to retrieve the current blend equation being used for drawing. The returned value will be one of the following constants (the default value is bm_eq_add):</Description>
+		</Function>
+		<Function Name="gpu_get_blendequation_sepalpha" Deprecated="false" ReturnType="Array[Constant.BlendModeEquation]" Pure="true">
+			<Description>This function can be used to retrieve the current blend and alpha blend equations being used for drawing. The function returns a 2 element 1D array with the following elements in it:</Description>
+		</Function>
 		<Function Name="gpu_get_colourwriteenable" Deprecated="false" ReturnType="Array[Bool]" Locale="GB" Pure="true">
 			<Description>This function can be used to retrieve the current colour write-enable values. The function returns a 4 element 1D array with the following elements in it which will be either true (enabled) or false (disabled). By default all colour writing is set to true:</Description>
 		</Function>
@@ -4715,20 +4731,29 @@
 			<Parameter Name="enable" Type="Bool" Optional="false">Enable or disable alpha blending value (true or false).</Parameter>
 		</Function>
 		<Function Name="gpu_set_blendmode" Deprecated="false" ReturnType="Undefined" Pure="false">
-			<Description>When GameMaker goes to draw a pixel there is a source colour (the colour of the pixel we&apos;re going to draw) and a destination colour(the colour that&apos;s already in the pixel we&apos;re drawing to), so when determining the new colour of the pixel, the source and destination colours are calculated according to the chosen blend mode. Each component of the colours is stored as a floating point value between 0 and 1, and the new colour is calculated by multiply each component of the source colour by some factor and by multiplying each component of destination colour by some other factor and then adding the results together component by component.</Description>
+			<Description>When GameMaker goes to draw a pixel there is a source colour (the colour of the pixel we&apos;re going to draw) and a destination colour(the colour that&apos;s already in the pixel we&apos;re drawing to), so when determining the new colour of the pixel, the source and destination colours are calculated according to the chosen blend mode. Each component of the colours is stored as a floating point value between 0 and 1, and the new colour is calculated by multiplying each component of the source colour by some factor and by multiplying each component of destination colour by some other factor and then adding the results together component by component.</Description>
 			<Parameter Name="mode" Type="Constant.BlendMode" Optional="false">The blend mode to use (see the table above)</Parameter>
 		</Function>
 		<Function Name="gpu_set_blendmode_ext" Deprecated="false" ReturnType="Undefined" Pure="false">
-			<Description>When GameMaker goes to draw a pixel there is a source colour (the colour of the pixel we&apos;re going to draw) and a destination colour (the colour that&apos;s already in the pixel we&apos;re drawing to), so when determining the new colour of the pixel, the source and destination colours are calculated according to the chosen blend mode. Each component of the colours is stored as a floating point value between 0 and 1, and the new colour is calculated by multiply each component of the source colour by some factor and by multiplying each component of destination colour by some other factor and then adding the results together component by component.</Description>
+			<Description>When GameMaker goes to draw a pixel there is a source colour (the colour of the pixel we&apos;re going to draw) and a destination colour (the colour that&apos;s already in the pixel we&apos;re drawing to), so when determining the new colour of the pixel, the source and destination colours are calculated according to the chosen blend mode. Each component of the colours is stored as a floating point value between 0 and 1, and the new colour is calculated by multiplying each component of the source colour by some factor and by multiplying each component of destination colour by some other factor and then adding the results together component by component.</Description>
 			<Parameter Name="src" Type="Constant.BlendModeFactor" Optional="false">Source blend mode factor(see constants above).</Parameter>
 			<Parameter Name="dest" Type="Constant.BlendModeFactor" Optional="false">Destination blend mode factor (see constants above)</Parameter>
 		</Function>
 		<Function Name="gpu_set_blendmode_ext_sepalpha" Deprecated="false" ReturnType="Undefined" Pure="false">
-			<Description>When GameMaker goes to draw a pixel there is a source colour (the colour of the pixel we&apos;re going to draw) and a destination colour(the colour that&apos;s already in the pixel we&apos;re drawing to), so when determining the new colour of the pixel, the source and destination colours are calculated according to the chosen blend mode. Each component of the colours is stored as a floating point value between 0 and 1, and the new colour is calculated by multiply each component of the source colour by some factor and by multiplying each component of destination colour by some other factor and then adding the results together component by component.</Description>
+			<Description>When GameMaker goes to draw a pixel there is a source colour (the colour of the pixel we&apos;re going to draw) and a destination colour(the colour that&apos;s already in the pixel we&apos;re drawing to), so when determining the new colour of the pixel, the source and destination colours are calculated according to the chosen blend mode. Each component of the colours is stored as a floating point value between 0 and 1, and the new colour is calculated by multiplying each component of the source colour by some factor and by multiplying each component of destination colour by some other factor and then adding the results together component by component.</Description>
 			<Parameter Name="src" Type="Constant.BlendModeFactor" Optional="false">Source blend mode factor for RGB (see constants above).</Parameter>
 			<Parameter Name="dest" Type="Constant.BlendModeFactor" Optional="false">Destination blend mode factor for RGB(see constants above)</Parameter>
 			<Parameter Name="alphasrc" Type="Constant.BlendModeFactor" Optional="false">Source blend mode factor Alpha (see constants above).</Parameter>
 			<Parameter Name="alphadest" Type="Constant.BlendModeFactor" Optional="false">Destination blend mode factor Alpha (see constants above)</Parameter>
+		</Function>
+		<Function Name="gpu_set_blendequation" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>When GameMaker goes to draw a pixel there is a source colour (the colour of the pixel we&apos;re going to draw) and a destination colour(the colour that&apos;s already in the pixel we&apos;re drawing to), so when determining the new colour of the pixel, the source and destination colours are calculated according to the chosen blend mode. Each component of the colours is stored as a floating point value between 0 and 1, and the new colour is calculated by multiplying each component of the source colour by some factor and by multiplying each component of destination colour by some other factor and then combining the results together component by component using a configurable equation.</Description>
+			<Parameter Name="equation" Type="Constant.BlendModeEquation" Optional="false">The blend equation to use (see the table above)</Parameter>
+		</Function>
+		<Function Name="gpu_set_blendequation_sepalpha" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>When GameMaker goes to draw a pixel there is a source colour (the colour of the pixel we&apos;re going to draw) and a destination colour(the colour that&apos;s already in the pixel we&apos;re drawing to), so when determining the new colour of the pixel, the source and destination colours are calculated according to the chosen blend mode. Each component of the colours is stored as a floating point value between 0 and 1, and the new colour is calculated by multiplying each component of the source colour by some factor and by multiplying each component of destination colour by some other factor and then combining the results together component by component using a configurable equation.</Description>
+			<Parameter Name="equation" Type="Constant.BlendModeEquation" Optional="false">The blend equation to use (see the table above)</Parameter>
+			<Parameter Name="equation_alpha" Type="Constant.BlendModeEquation" Optional="false">The alpha blend equation to use (see the table above)</Parameter>
 		</Function>
 		<Function Name="gpu_set_colourwriteenable" Deprecated="false" ReturnType="Undefined" Locale="GB" Pure="false">
 			<Description>With this function you can switch on or off the colour channels and the alpha channel for all further drawing. For example, you can use this function to create alpha-channel only surfaces (switch off the RGB writing before using the surface), or to create special effects while drawing to the screen. The default value for each of the components is true, and can be supplied as either four unique arguments or as a 4 element 1D array with the following elements in it which will be either true (enabled) or false (disabled):</Description>
@@ -6125,8 +6150,8 @@
 		<Function Name="texturegroup_set_mode" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can configure how texture group loading is handled as well as set debug options</Description>
 			<Parameter Name="explicit" Type="Bool" Optional="false">If false, indicates that texture pages are automatically loaded if a sprite is rendered from an unloaded texture group</Parameter>
-			<Parameter Name="debug" Type="Bool" Optional="false">If true, enables a debug view</Parameter>
-			<Parameter Name="default_sprite" Type="Asset.GMSprite" Optional="false">Specifies default sprite which is used for drawing when a texture group hasn't been loaded</Parameter>
+			<Parameter Name="debug" Type="Bool" Optional="true">If true, enables a debug view</Parameter>
+			<Parameter Name="default_sprite" Type="Asset.GMSprite" Optional="true">Specifies default sprite which is used for drawing when a texture group hasn't been loaded</Parameter>
 		</Function>
 		<Function Name="texture_debug_messages" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function can be used to enable or disable texture debug messages. When enabled (set to true), additional information about texture page use will be sent to the output window. Set to false to disable this output again.</Description>
@@ -6549,6 +6574,9 @@
 		<Function Name="gamepad_axis_count" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>This function will return the number of &quot;axis&quot; controls on the device being checked. These controls are the analogue direction &quot;thumbsticks&quot; on most controllers.</Description>
 			<Parameter Name="device" Type="Real" Optional="false">Which gamepad device &quot;slot&quot; to check.</Parameter>
+		</Function>
+		<Function Name="gamepad_enumerate" Deprecated="false" ReturnType="Undefined" Pure="true">
+			<Description>Currently only functional on Android, this function will enumerate gamepads to detect any newly added gamepads and remove any recently removed ones without the need for BLUETOOTH_CONNECT permission.</Description>
 		</Function>
 		<Function Name="gamepad_axis_value" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>You can use this function to get the value of the different axes from a given gamepad slot. You supply the gamepad slot index to check, along with either an axis index constant (as listed here), or an integer value between 0 and gamepad_axis_count()-1. The returned value will be between -1 and 1 for each of the available horizontal and vertical axes.</Description>
@@ -7551,7 +7579,7 @@
 			<Parameter Name="ordered" Type="Bool" Optional="false">Whether the list should be ordered by distance (true) or not (false).</Parameter>
 		</Function>
 		<Function Name="collision_point" Deprecated="false" ReturnType="Id.Instance" Pure="true">
-			<Description>Collision_point checks the point specified by the arguments x1,y1 for a collision with any instance of the object specified by the argument &quot;obj&quot;. this check can be either precise or not, but for precise collisions to be enabled, the object or instance that you are checking for must also have precise collisions enabled for their sprite. If not, the default check is based on bounding boxes. The following image illustrates how this works:</Description>
+			<Description>Collision_point checks the point specified by the arguments x,y for a collision with any instance of the object specified by the argument &quot;obj&quot;. this check can be either precise or not, but for precise collisions to be enabled, the object or instance that you are checking for must also have precise collisions enabled for their sprite. If not, the default check is based on bounding boxes. The following image illustrates how this works:</Description>
 			<Parameter Name="x" Type="Real" Optional="false">The x coordinate of the point to check.</Parameter>
 			<Parameter Name="y" Type="Real" Optional="false">The y coordinate of the point to check.</Parameter>
 			<Parameter Name="obj" Type="Id.TileMapElement,Asset.GMObject,Id.Instance,Constant.All,Constant.Other,Array" Optional="false">The object to check for instance collisions.</Parameter>
@@ -7835,7 +7863,7 @@
 			<Parameter Name="xgoal" Type="Real" Optional="false">The target x position.</Parameter>
 			<Parameter Name="ygoal" Type="Real" Optional="false">The target y position.</Parameter>
 			<Parameter Name="stepsize" Type="Real" Optional="false">The speed the instance moves in pixels per step.</Parameter>
-			<Parameter Name="obj" Type="Id.Instance" Optional="false">The object that is to block the path of the instance running the function. Can be an object index, an instance id or the special keyword ,all.</Parameter>
+			<Parameter Name="obj" Type="Id.Instance,Asset.GMObject,Constant.All" Optional="false">The object that is to block the path of the instance running the function. Can be an object index, an instance id or the special keyword ,all.</Parameter>
 		</Function>
 		<Function Name="motion_add" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function will modify the current direction and speed of the instance running the code, combining the values given with the current values. If you wish to simply change these values, you should be using the function motion_set().</Description>
@@ -9667,7 +9695,9 @@
 			<Parameter Name="col" Type="Constant.Color" Optional="false">The colour to blend with the texture at this vertex (-1 or c_white for no blending).</Parameter>
 			<Parameter Name="alpha" Type="Real" Optional="false">The alpha to draw this vertex with (0-1).</Parameter>
 		</Function>
-		<Function Name="display_get_gui_height" Deprecated="false" ReturnType="Real" Pure="true" />
+		<Function Name="display_get_gui_height" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>With this function you can get the height (in pixels) of the GUI as used in the Draw GUI Event.</Description>
+		</Function>
 		<Function Name="window_set_color" Deprecated="false" ReturnType="Undefined" Locale="US" Pure="false">
 			<Description>This function can set the background colour of the game window. This colour represents that which will be used for those areas of the game window that are not occupied by any views. The following image illustrates this:</Description>
 			<Parameter Name="colour" Type="Constant.Color" Optional="false">The colour to set the region.</Parameter>
@@ -10069,7 +10099,7 @@
 			<Parameter Name="image" Type="Any" Optional="false" />
 		</Function>
 		<Function Name="uwp_livetile_notification_end" Deprecated="true" ReturnType="Undefined" Pure="false" />
-		<Function Name="uwp_livetile_notification_template_add" Deprecated="false" ReturnType="Undefined" Pure="false">
+		<Function Name="uwp_livetile_notification_template_add" Deprecated="true" ReturnType="Undefined" Pure="false">
 			<Parameter Name="template" Type="Any" Optional="false" />
 		</Function>
 		<Function Name="uwp_appbar_enable" Deprecated="true" ReturnType="Undefined" Pure="false">
@@ -10143,15 +10173,18 @@
 			<Parameter Name="included_filename" Type="Any" Optional="false" />
 		</Function>
 		<Function Name="physics_get_friction" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>When you bind a fixture to an instance using physics_fixture_bind() this returns an "id" for the bound fixture.</Description>
 			<Parameter Name="fixture" Type="Id.PhysicsIndex" Optional="false" />
 		</Function>
 		<Function Name="physics_particle_group_get_mass" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>With this function you can retrieve the mass of an entire group of particles. The group value is that which was returned when you created the group of particles using the function physics_particle_group_end().</Description>
 			<Parameter Name="group" Type="Id.PhysicsParticleGroup" Optional="false" />
 		</Function>
 		<Function Name="shader_reset" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function resets the shader used for drawing and should be called when you no longer wish to use the current shader (set using shader_set()).</Description>
 		</Function>
 		<Function Name="shader_set_uniform_i_array" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>With this function you can set a shader constant to hold an array of values. You must previously have gotten the "handle" of the constant using the function shader_get_uniform(), and you will have to have previously initialised the array.</Description>
 			<Parameter Name="uniform_id" Type="Id.Uniform" Optional="false">The handle of the shader constant to set.</Parameter>
 			<Parameter Name="array" Type="Array[Real]" Optional="false">A previously initialised array of integer values.</Parameter>
 		</Function>
@@ -10193,15 +10226,22 @@
 			<Parameter Name="slot" Type="String" Optional="false">The slot name to check, a string</Parameter>
 		</Function>
 		<Function Name="skeleton_animation_get_event_frames" Deprecated="false" ReturnType="Array[Real]" Pure="true">
+			<Description>This function can be used to retrieve all the frames for the given event, in the given animation.</Description>
 			<Parameter Name="anim_name" Type="String" Optional="false" />
 			<Parameter Name="event_name" Type="String" Optional="false" />
 		</Function>
 		<Function Name="draw_enable_skeleton_blendmodes" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function is used to enable (true) or disable (false) per-slot blend modes for skeletal sprites.</Description>
 			<Parameter Name="enable" Type="Bool" Optional="false" />
 		</Function>
-		<Function Name="draw_get_enable_skeleton_blendmodes" Deprecated="false" ReturnType="Bool" Pure="true" />
-		<Function Name="layer_get_forced_depth" Deprecated="false" ReturnType="Bool" Pure="true" />
+		<Function Name="draw_get_enable_skeleton_blendmodes" Deprecated="false" ReturnType="Bool" Pure="true">
+			<Description>This function returns whether per-slot blend modes for skeletal sprites are enabled (true) or disabled (false).</Description>
+		</Function>
+		<Function Name="layer_get_forced_depth" Deprecated="false" ReturnType="Bool" Pure="true">
+			<Description>This function can be used to retrieve the Z depth set for rendering layers within the room.</Description>
+		</Function>
 		<Function Name="layer_background_change" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can set the sprite index of the background element.</Description>
 			<Parameter Name="background_element_id" Type="Id.BackgroundElement" Optional="false" />
 			<Parameter Name="sprite" Type="Asset.GMSprite" Optional="false" />
 		</Function>
@@ -10336,6 +10376,7 @@
 			<Parameter Name="curve_struct_or_id" Type="Asset.GMAnimCurve,Struct.AnimCurve" Optional="false">The Animation Curve asset or struct that will be checked.</Parameter>
 		</Function>
 		<Function Name="weak_ref_alive" Deprecated="false" ReturnType="Bool" Pure="true">
+			<Description>With this function you can check the weak reference to a struct to see if it is still "alive" or not.</Description>
 			<Parameter Name="weak_ref" Type="Struct.WeakRef" Optional="false" />
 		</Function>
 		<Function Name="fx_create" Deprecated="false" ReturnType="Struct.Fx" Pure="false">
@@ -10669,8 +10710,8 @@
 		<Variable Name="view_surface_id" Type="Array[Id.Surface]" Deprecated="false" Get="true" Set="true" Instance="false">With this variable you can set the contents of a given view port to draw to a surface, or get the current surface id if one has been assigned to a view port. When working with surfaces, it is often required that you capture the whole visible region of the screen to the surface, and so you would assign it to a view port using this variable. This means that everything that is shown in the chosen view will now be drawn to the assigned surface. The view will now not be drawn to the screen, meaning that you will need to either:</Variable>
 		<Variable Name="view_visible" Type="Array[Bool]" Deprecated="false" Get="true" Set="true" Instance="false">This variable can be used to find out if a particular view port is currently visible or not. You can also set this variable to effectively turn &quot;on&quot; or &quot;off&quot; a view by setting the value to true (visible) or false (invisible). Note that even if you have a view port set to visible, if view ports are not enabled (using the built-in variable view_enabled or enabling them in the Room Editor) then they will not be drawn to the screen.</Variable>
 		<Variable Name="view_wport" Type="Array[Real]" Deprecated="false" Get="true" Set="true" Instance="false">This variable can be used to get or to set the width of the specified view port. The width of the view port (or combined view ports if more than one are active) define the width of the game window or background canvas at the start of the game, so changing this value after the game has started will have no visible effect on the game window size unless called along with the function window_set_size(). If you have a larger or smaller port size than that assigned to the camera, then the camera view will be scaled down - or up - to fit, as illustrated by the image below.</Variable>
-		<Variable Name="view_xport" Type="Array[Real]" Deprecated="true" Get="true" Set="true" Instance="false">With this built in array you can get or set the x position of the given view port. The view port is the area on the screen where the view is drawn, and you can have up to 8 active at any one time (the array is values from 0 to 7 inclusive to give 8 ports). Now, the default for GameMaker is that the game window (or background canvas) is the same size as the room, however when you activate view ports and cameras, this behaviour changes and the total size of the bounding box for all view ports is used. So, if you have two different view ports at two different positions, the total area that they cover defines the size of the game window. The following image illustrates this:</Variable>
-		<Variable Name="view_yport" Type="Array[Real]" Deprecated="true" Get="true" Set="true" Instance="false">With this built in array you can get or set the y position of the given view port. The view port is the area on the screen where the view is drawn, and you can have up to 8 active at any one time (the array is values from 0 to 7 inclusive to give 8 ports). Now, the default for GameMaker is that the game window (or background canvas) is the same size as the room, however when you activate view ports and cameras, this behaviour changes and the total size of the bounding box for all view ports is used. So, if you have two different view ports at two different positions, the total area that they cover defines the size of the game window. The following image illustrates this:</Variable>
+		<Variable Name="view_xport" Type="Array[Real]" Deprecated="false" Get="true" Set="true" Instance="false">With this built in array you can get or set the x position of the given view port. The view port is the area on the screen where the view is drawn, and you can have up to 8 active at any one time (the array is values from 0 to 7 inclusive to give 8 ports). Now, the default for GameMaker is that the game window (or background canvas) is the same size as the room, however when you activate view ports and cameras, this behaviour changes and the total size of the bounding box for all view ports is used. So, if you have two different view ports at two different positions, the total area that they cover defines the size of the game window. The following image illustrates this:</Variable>
+		<Variable Name="view_yport" Type="Array[Real]" Deprecated="false" Get="true" Set="true" Instance="false">With this built in array you can get or set the y position of the given view port. The view port is the area on the screen where the view is drawn, and you can have up to 8 active at any one time (the array is values from 0 to 7 inclusive to give 8 ports). Now, the default for GameMaker is that the game window (or background canvas) is the same size as the room, however when you activate view ports and cameras, this behaviour changes and the total size of the bounding box for all view ports is used. So, if you have two different view ports at two different positions, the total area that they cover defines the size of the game window. The following image illustrates this:</Variable>
 		<Variable Name="debug_mode" Type="Bool" Deprecated="true" Get="true" Set="false" Instance="false">This read only variable returns true when the game is being played in debug mode and false when being played as normal.</Variable>
 		<Variable Name="fps" Type="Real" Deprecated="false" Get="true" Set="false" Instance="false">In GameMaker there are two main ways that can be used to tell the speed at which your game runs. The game speed (as specified in the Game Options) and the fps (frames per second). These values are often confused, but basically one is the number of game steps that GameMaker is supposed to be completing in a second, while the other (the fps) is the number of CPU steps that GameMaker is actually completing in a second up to a maximum value of the room speed itself. To get the true fps, ie. the actual number of cpu steps per game step, use the fps_real variable.</Variable>
 		<Variable Name="fps_real" Type="Real" Deprecated="false" Get="true" Set="false" Instance="false">In GameMaker there are two main ways that can be used to tell the speed at which your game runs. The game speed (as specified in the Game Options) and the fps (frames per second). These values are often confused, but basically one is the number of game steps that GameMaker is supposed to be completing in a second (game speed), while the other is the number of CPU steps that GameMaker is actually completing in a second (the real fps), and this value is generally much higher than the game speed, but will drop as your game gets more complex and uses more processing power to maintain the set room speed.</Variable>
@@ -10711,8 +10752,8 @@
 		<Variable Name="phy_angular_velocity" Type="Real" Deprecated="false" Get="true" Set="true" Instance="true">This variable can be used to set the angular velocity of the instance, or it can be used to get the current angular velocity, in degrees per second and the value used can be either positive (for clockwise rotation) or negative (for anticlockwise rotation). If you set this on an instance that was previously static (ie: it has a density of 0) it will become a kinematic object and begin rotating</Variable>
 		<Variable Name="phy_bullet" Type="Bool" Deprecated="false" Get="true" Set="true" Instance="true">This variable defines whether or not the instance is extremely fast moving (for example a bullet). The default value is false but if set to true this tells GameMaker that the instance will be moving at such high speeds that it will require more expensive collision detection to ensure it doesn&apos;t pass through other instances undetected</Variable>
 		<Variable Name="phy_collision_points" Type="Real" Deprecated="false" Get="true" Set="false" Instance="true">This read-only variable returns the number of points of collision detected between the two objects in the collision</Variable>
-		<Variable Name="phy_collision_x" Type="Real" Deprecated="false" Get="true" Set="false" Instance="true">This read-only array returns the x position of all points detected in a collision between two physics enabled instances.</Variable>
-		<Variable Name="phy_collision_y" Type="Real" Deprecated="false" Get="true" Set="false" Instance="true">This read-only array returns the y position of all points detected in a collision between two physics enabled instances.</Variable>
+		<Variable Name="phy_collision_x" Type="Array[Real]" Deprecated="false" Get="true" Set="false" Instance="true">This read-only array returns the x position of all points detected in a collision between two physics enabled instances.</Variable>
+		<Variable Name="phy_collision_y" Type="Array[Real]" Deprecated="false" Get="true" Set="false" Instance="true">This read-only array returns the y position of all points detected in a collision between two physics enabled instances.</Variable>
 		<Variable Name="phy_col_normal_x" Type="Real" Deprecated="false" Get="true" Set="false" Instance="true">This read-only variable returns the x component of the collision normal corresponding to the phy_collision_x array value. For each contact point there is an associated contact normal (which is usually the same normal for all points of contact in the collision). This contact normal is a unit vector that points from one instance in the collision to another, and can be used, for example, to calculate the correct &quot;push&quot; direction to resolve collisions</Variable>
 		<Variable Name="phy_col_normal_y" Type="Real" Deprecated="false" Get="true" Set="false" Instance="true">This read-only variable returns the y component of the collision normal corresponding to the phy_collision_y array value. For each contact point there is an associated contact normal (which is usually the same normal for all points of contact in the collision). This contact normal is a unit vector that points from one instance in the collision to another, and can be used, for example, to calculate the correct &quot;push&quot; direction to resolve collisions</Variable>
 		<Variable Name="phy_com_x" Type="Real" Deprecated="false" Get="true" Set="false" Instance="true">This read-only variable will return the x position of the instance&apos;s center of mass. This is calculated automatically based on the density, inertia and mass of the instance as defined by the appropriate functions</Variable>
@@ -11073,8 +11114,10 @@
 		<Constant Name="c_ltgrey" Class="Color" Type="Real" Deprecated="false">#c0c0c0</Constant>
 		<Constant Name="bm_normal" Class="BlendMode" Type="Real" Deprecated="false">Normal blending (the default blend mode).</Constant>
 		<Constant Name="bm_add" Class="BlendMode" Type="Real" Deprecated="false">Additive blending. Luminosity values of light areas are added.</Constant>
-		<Constant Name="bm_subtract" Class="BlendMode" Type="Real" Deprecated="false">Subtractive blending. Luminosity values of light areas are subtracted.</Constant>
+		<Constant Name="bm_subtract" Class="BlendMode" Type="Real" Deprecated="false">Subtractive blending where the source colour is subtracted from the destination colour.</Constant>
 		<Constant Name="bm_max" Class="BlendMode" Type="Real" Deprecated="false">Max blending. Similar to additive blending.</Constant>
+		<Constant Name="bm_min" Class="BlendMode" Type="Real" Deprecated="false">Min blending (Takes the minimum value for each colour component).</Constant>
+		<Constant Name="bm_reverse_subtract" Class="BlendMode" Type="Real" Deprecated="false">Subtractive blending where the destination colour is subtracted from the source colour.</Constant>
 		<Constant Name="bm_zero" Class="BlendModeFactor" Type="Real" Deprecated="false">(0, 0, 0, 0)</Constant>
 		<Constant Name="bm_one" Class="BlendModeFactor" Type="Real" Deprecated="false">(1, 1, 1, 1)</Constant>
 		<Constant Name="bm_src_colour" Class="BlendModeFactor" Type="Real" Deprecated="false" Locale="GB">(Rs, Gs, Bs, As)</Constant>
@@ -11090,6 +11133,11 @@
 		<Constant Name="bm_inv_dest_colour" Class="BlendModeFactor" Type="Real" Deprecated="false" Locale="GB">(1-Rd, 1-Gd, 1-Bd, 1-Ad)</Constant>
 		<Constant Name="bm_inv_dest_color" Class="BlendModeFactor" Type="Real" Deprecated="false" Locale="US">(1-Rd, 1-Gd, 1-Bd, 1-Ad)</Constant>
 		<Constant Name="bm_src_alpha_sat" Class="BlendModeFactor" Type="Real" Deprecated="false">(f, f, f, 1) where f = min(As, 1-Ad)</Constant>
+		<Constant Name="bm_eq_add" Class="BlendModeEquation" Type="Real" Deprecated="false">Additive blending. Luminosity values of light areas are added.</Constant>
+		<Constant Name="bm_eq_subtract" Class="BlendModeEquation" Type="Real" Deprecated="false">Subtractive blending where the source colour is subtracted from the destination colour.</Constant>
+		<Constant Name="bm_eq_max" Class="BlendModeEquation" Type="Real" Deprecated="false">Max blending (Takes the maximum value for each colour component).</Constant>
+		<Constant Name="bm_eq_min" Class="BlendModeEquation" Type="Real" Deprecated="false">Min blending (Takes the minimum value for each colour component).</Constant>
+		<Constant Name="bm_eq_reverse_subtract" Class="BlendModeEquation" Type="Real" Deprecated="false">Subtractive blending where the destination colour is subtracted from the source colour.</Constant>
 		<Constant Name="cull_noculling" Class="CullMode" Type="Real" Deprecated="false">No culling will be done</Constant>
 		<Constant Name="cull_clockwise" Class="CullMode" Type="Real" Deprecated="false">All clockwise triangles will be culled</Constant>
 		<Constant Name="cull_counterclockwise" Class="CullMode" Type="Real" Deprecated="false">All counter-clockwise triangles will be culled</Constant>
@@ -11214,6 +11262,18 @@
 		<Constant Name="gp_axis_orientation_y" Class="GamepadAxis" Type="Real" Deprecated="false">The gamepad&apos;s Y orientation</Constant>
 		<Constant Name="gp_axis_orientation_z" Class="GamepadAxis" Type="Real" Deprecated="false">The gamepad&apos;s Z orientation</Constant>
 		<Constant Name="gp_axis_orientation_w" Class="GamepadAxis" Type="Real" Deprecated="false">The gamepad&apos;s W orientation</Constant>
+		<Constant Name="gp_home" Class="GamepadButton" Type="Real" Deprecated="false">The gamepad&apos;s Home button</Constant>
+		<Constant Name="gp_extra1" Class="GamepadButton" Type="Real" Deprecated="false">A gamepad button used for mapping extra buttons on a device</Constant>
+		<Constant Name="gp_extra2" Class="GamepadButton" Type="Real" Deprecated="false">A gamepad button used for mapping extra buttons on a device</Constant>
+		<Constant Name="gp_extra3" Class="GamepadButton" Type="Real" Deprecated="false">A gamepad button used for mapping extra buttons on a device</Constant>
+		<Constant Name="gp_extra4" Class="GamepadButton" Type="Real" Deprecated="false">A gamepad button used for mapping extra buttons on a device</Constant>
+		<Constant Name="gp_extra5" Class="GamepadButton" Type="Real" Deprecated="false">A gamepad button used for mapping extra buttons on a device</Constant>
+		<Constant Name="gp_extra6" Class="GamepadButton" Type="Real" Deprecated="false">A gamepad button used for mapping extra buttons on a device</Constant>
+		<Constant Name="gp_paddler" Class="GamepadButton" Type="Real" Deprecated="false">A gamepad button used for mapping paddle right button on a device</Constant>
+		<Constant Name="gp_paddlel" Class="GamepadButton" Type="Real" Deprecated="false">A gamepad button used for mapping paddle left button on a device</Constant>
+		<Constant Name="gp_paddlerb" Class="GamepadButton" Type="Real" Deprecated="false">A gamepad button used for mapping paddle right bottom button on a device</Constant>
+		<Constant Name="gp_paddlelb" Class="GamepadButton" Type="Real" Deprecated="false">A gamepad button used for mapping paddle left bottom button on a device</Constant>
+		<Constant Name="gp_touchpadbutton" Class="GamepadButton" Type="Real" Deprecated="false">A gamepad button used for mapping the touchpad button on a device (i.e. PS4 and PS5)</Constant>
 		<Constant Name="vk_nokey" Class="VirtualKey" Type="Real" Deprecated="false">keycode representing that no key is pressed</Constant>
 		<Constant Name="vk_anykey" Class="VirtualKey" Type="Real" Deprecated="false">keycode representing that any key is pressed</Constant>
 		<Constant Name="vk_left" Class="VirtualKey" Type="Real" Deprecated="false">keycode for the left arrow key</Constant>
