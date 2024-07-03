@@ -161,7 +161,7 @@
 			<Parameter Name="priority" Type="Real" Optional="false">Set the channel priority for the sound.</Parameter>
 			<Parameter Name="loop" Type="Bool" Optional="false">Sets the sound to loop or not.</Parameter>
 			<Parameter Name="gain" Type="Real" Optional="true">Sets the gain of the sound played.</Parameter>
-			<Parameter Name="offset" Type="Real" Optional="true">Sets the start offset (in seconds) of the sound played.</Parameter>
+			<Parameter Name="offset" Type="Real,Undefined" Optional="true">Sets the start offset (in seconds) of the sound played.</Parameter>
 			<Parameter Name="pitch" Type="Real" Optional="true">Sets the pitch of the sound played.</Parameter>
 			<Parameter Name="listener_mask" Type="Real" Optional="true">Sets the listener mask of the sound played.</Parameter>
 		</Function>
@@ -177,13 +177,17 @@
 			<Parameter Name="loop" Type="Bool" Optional="false">Flags the sound as looping or not.</Parameter>
 			<Parameter Name="priority" Type="Real" Optional="false">Set the channel priority for the sound.</Parameter>
 			<Parameter Name="gain" Type="Real" Optional="true">Sets the gain of the sound played.</Parameter>
-			<Parameter Name="offset" Type="Real" Optional="true">Sets the start offset (in seconds) of the sound played.</Parameter>
+			<Parameter Name="offset" Type="Real,Undefined" Optional="true">Sets the start offset (in seconds) of the sound played.</Parameter>
 			<Parameter Name="pitch" Type="Real" Optional="true">Sets the pitch of the sound played.</Parameter>
 			<Parameter Name="listener_mask" Type="Real" Optional="true">Sets the listener mask of the sound played.</Parameter>
 		</Function>
 		<Function Name="audio_play_sound_ext" Deprecated="false" ReturnType="Id.Sound" Pure="false">
 			<Description>With this function you can play any sound resource in your game. You provide a struct which contains a set of required parameters as well as any additional playback parameters. Parameters not specified will fall back to their default values/behaviour.</Description>
 			<Parameter Name="params" Type="Struct" Optional="false">A struct containing a set of playback parameters.</Parameter>
+		</Function>
+		<Function Name="audio_sound_get_asset" Deprecated="false" ReturnType="Asset.GMSound" Pure="true">
+			<Description>This function will return a reference to the audio asset being played by the voice represented by the given voice index, or undefined if the voice index does not refer to an active voice.</Description>
+			<Parameter Name="index" Type="Id.Sound" Optional="false">The voice index of the sound.</Parameter>
 		</Function>
 		<Function Name="audio_resume_all" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can resume all sounds that have been paused previously.</Description>
@@ -417,7 +421,7 @@
 			<Parameter Name="loop" Type="Bool" Optional="false">Flags the sound as looping or not.</Parameter>
 			<Parameter Name="priority" Type="Real" Optional="false">Set the channel priority for the sound.</Parameter>
 			<Parameter Name="gain" Type="Real" Optional="true">Sets the gain of the sound played.</Parameter>
-			<Parameter Name="offset" Type="Real" Optional="true">Sets the start offset (in seconds) of the sound played.</Parameter>
+			<Parameter Name="offset" Type="Real,Undefined" Optional="true">Sets the start offset (in seconds) of the sound played.</Parameter>
 			<Parameter Name="pitch" Type="Real" Optional="true">Sets the pitch of the sound played.</Parameter>
 			<Parameter Name="listener_mask" Type="Real" Optional="true">Sets the listener mask of the sound played.</Parameter>
 		</Function>
@@ -763,7 +767,7 @@
 			<Parameter Name="execute_event_flag" Type="Bool" Optional="true">Set to true or false to perform the destroy event or not (optional, default is true)</Parameter>
 		</Function>
 		<Function Name="instance_exists" Deprecated="false" ReturnType="Bool" Pure="true">
-			<Description>This function can be used in two ways depending on what you wish to check. You can give it an object_index to check for, in which case this function will return true if any active instances of the specified object exist in the current room, or you can also supply it with an instance id, in which case this function will return true if that specific instance exists and is active in the current room.</Description>
+			<Description>This function checks if any instance of the given Object handle exists in the room, or whether the given specific Instance handle exists in the room.</Description>
 			<Parameter Name="obj" Type="Id.Instance,Asset.GMObject,Undefined" Optional="false">The object or instance to check for the existence of.</Parameter>
 		</Function>
 		<Function Name="instance_find" Deprecated="false" ReturnType="Id.Instance" Pure="true">
@@ -1726,6 +1730,190 @@
 			<Parameter Name="sprite_element_id" Type="Id.SpriteElement" Optional="false">The unique ID value of the sprite element to change</Parameter>
 			<Parameter Name="yscale" Type="Real" Optional="false">The yscale value (default is 1)</Parameter>
 		</Function>
+		<Function Name="layer_text_get_id" Deprecated="false" ReturnType="Id.TextElement" Pure="true">
+			<Description>This function can be used to retrieve the unique ID value of a text element on a layer. You supply the layer ID (which you get when you create the layer using layer_create() or when you use the layer name along with layer_get_id()) and the name of the text element as defined in the Room Editor. The function will return the ID value associated with that text element on the layer.</Description>
+			<Parameter Name="layer_id" Type="String,Id.Layer" Optional="false">The unique ID value of the layer to target</Parameter>
+			<Parameter Name="text_element_name" Type="String" Optional="false">The unique name of the text element on the layer as defined in the Room Editor</Parameter>
+		</Function>
+		<Function Name="layer_text_exists" Deprecated="false" ReturnType="Bool" Pure="true">
+			<Description>You can use this function to check and see if a text element exists on any given layer. You supply the layer ID (which you get when you create the layer using layer_create()) or the layer name (as a string - this will have a performance impact) and the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()) and the function will return either true if the element exists, or false if it does not.</Description>
+			<Parameter Name="layer_id" Type="String,Id.Layer" Optional="false">The unique ID value of the layer to target (or the layer name as a string)</Parameter>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to check</Parameter>
+		</Function>
+		<Function Name="layer_text_create" Deprecated="false" ReturnType="Id.TextElement" Pure="false">
+			<Description>With this function you can create a new text element on the specified layer. You supply the layer ID (which you get when you create the layer using layer_create() or when you use the layer name along with layer_get_id()), a position within the room, a font reference (which would be the name of the font as shown in the Asset Browser), and the text to be displayed and it will be added to the layer. The function returns the unique ID value for the element, which can then be used in further layer functions for text elements.</Description>
+			<Parameter Name="layer_id" Type="String,Id.Layer" Optional="false">The unique ID value of the layer to target</Parameter>
+			<Parameter Name="x" Type="Real" Optional="false">The x position to use</Parameter>
+			<Parameter Name="y" Type="Real" Optional="false">The y position to use</Parameter>
+			<Parameter Name="font" Type="Asset.GMFont" Optional="false">The font to be used</Parameter>
+			<Parameter Name="text" Type="String" Optional="false">The text string to be displayed</Parameter>
+		</Function>
+		<Function Name="layer_text_destroy" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function will destroy the given text element. You supply the text ID (which you get when you create the text using layer_text_create() or when you use the layer ID along with layer_get_text_id()) and this will remove it. Note that this does not remove the layer, only the text element from it, and if the text element is one that has been added in the room editor, then the next time you leave the room and then return, the text element will be recreated again. However if the room is persistent, the text element will be removed unless room persistence is switched off again.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to be destroyed</Parameter>
+		</Function>
+		<Function Name="layer_text_x" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function controls the position along the x-axis of the room of the text element on the layer. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the x value to use (based on the room coordinates).</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="x" Type="Real" Optional="false">The x position for the text element</Parameter>
+		</Function>
+		<Function Name="layer_text_y" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function controls the position along the y-axis of the room of the text element on the layer. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the y value to use (based on the room coordinates).</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="y" Type="Real" Optional="false">The y position for the text element</Parameter>
+		</Function>
+		<Function Name="layer_text_angle" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change the angle for the given text element on a layer. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the angle value, from 0 to 359 anti-clockwise, where 0 is to the right, 90 is to the top, 180 is to the left and 270 is to the bottom. If you set a value greater than 360 this will be looped to bring it within the 0 - 359 range.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="angle" Type="Real" Optional="false">The angle of the text element (default is 0)</Parameter>
+		</Function>
+		<Function Name="layer_text_xscale" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change whether the given text element on a layer should be scaled along the x axis or not. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the scale value. A scale of 1 indicates no scaling (1:1), smaller values will scale down (0.5, for example, will half the width of the text element), larger values will scale up, and negative values will flip the text element and scale it unless the value used is exactly -1 (in which case the text element used is just flipped right-to-left about its origin position with no scaling).</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="xscale" Type="Real" Optional="false">The xscale value (default is 1)</Parameter>
+		</Function>
+		<Function Name="layer_text_yscale" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change whether the given text element on a layer should be scaled along the y axis or not. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the scale value. A scale of 1 indicates no scaling (1:1), smaller values will scale down (0.5, for example, will half the height of the text element), larger values will scale up, and negative values will flip the text element and scale it unless the value used is exactly -1 (in which case the text element used is just mirrored top-to-bottom about its origin position with no scaling).</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="yscale" Type="Real" Optional="false">The yscale value (default is 1)</Parameter>
+		</Function>
+		<Function Name="layer_text_blend" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function controls the colour (or &quot;tinting&quot;) of the text element and the default value is -1 (which represents the constant c_white, which can also be used). Any other value (including internal colour constants like c_red, or c_aqua) will draw the text element with the specified colour. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the colour to use.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="blend" Type="Constant.Color" Optional="false">The colour to draw the text element (default is c_white)</Parameter>
+		</Function>
+		<Function Name="layer_text_alpha" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function controls the alpha (transparency) of the text element on the asset layer. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the alpha value to use. Alpha can be between 0 (fully transparent) and 1 (fully opaque) with the default alpha value for the text element being 1. Note that if the layer the text element has been assigned to is not visible - or the element itself has been made invisible - you will not see any difference with this function until the layer or element has been made visible again.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="alpha" Type="Real" Optional="false">The alpha for text element, from 0 to 1 (default is 1)</Parameter>
+		</Function>
+		<Function Name="layer_text_font" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change the font resource assigned to a given text element on a layer. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then supply a font resource reference which the text element will be changed to use.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="font" Type="Asset.GMFont" Optional="false">The new font to use</Parameter>
+		</Function>
+		<Function Name="layer_text_xorigin" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change the x position of the origin of the given text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the origin value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="xorigin" Type="Real" Optional="false">The xorigin value (default is 0)</Parameter>
+		</Function>
+		<Function Name="layer_text_yorigin" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change the y position of the origin of the given text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the origin value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="yorigin" Type="Real" Optional="false">The yorigin value (default is 0)</Parameter>
+		</Function>
+		<Function Name="layer_text_text" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change the text string assigned to a given text element on a layer. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then supply a text string which the text element will be changed to use.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="text" Type="String" Optional="false">The new text string to be displayed</Parameter>
+		</Function>
+		<Function Name="layer_text_halign" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change the horizontal alignment of the given text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the alignment value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="alignment" Type="Constant.TextAlign" Optional="false">The alignment value (default is 0)</Parameter>
+		</Function>
+		<Function Name="layer_text_valign" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change the vertical alignment of the given text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the alignment value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="alignment" Type="Constant.TextAlign" Optional="false">The alignment value (default is 0)</Parameter>
+		</Function>
+		<Function Name="layer_text_charspacing" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change the character spacing of the given text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the spacing value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="charspacing" Type="Real" Optional="false">The character spacing value (default is 0)</Parameter>
+		</Function>
+		<Function Name="layer_text_linespacing" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change the line spacing of the given text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the spacing value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="linespacing" Type="Real" Optional="false">The line spacing value (default is 0)</Parameter>
+		</Function>
+		<Function Name="layer_text_framew" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change the width of the frame of the given text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the frame width value. This only affects rendering when wrapping is enabled.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="width" Type="Real" Optional="false">The frame width value (default is -1)</Parameter>
+		</Function>
+		<Function Name="layer_text_frameh" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change the height of the frame of the given text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set the frame width value. The affects vertical alignment of the text.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="height" Type="Real" Optional="false">The frame height value (default is -1)</Parameter>
+		</Function>
+		<Function Name="layer_text_wrap" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Using this function you can change whether wrapping is enabled for the given text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and then set true or false for the wrapping value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to change</Parameter>
+			<Parameter Name="wrap" Type="Bool" Optional="false">True if wrapping is enabled or false if disabled (default is false)</Parameter>
+		</Function>
+		<Function Name="layer_text_get_x" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get the x position of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the x position value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_y" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get the y position of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the y position value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_xscale" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get the x scale of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the x scale value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_yscale" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get the y scale of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the y scale value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_angle" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get the rotation angle of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the rotation angle value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_blend" Deprecated="false" ReturnType="Constant.Color" Pure="true">
+			<Description>This function can be used to get the blend colour of the text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return real value that represents the colour assigned.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_alpha" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get the alpha value of the text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return a value between 0 (fully transparent) and 1 (fully opaque).</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_font" Deprecated="false" ReturnType="Asset.GMFont" Pure="true">
+			<Description>This function can be used to get the font resource reference of the text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the font resource referenced assigned to the element.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_xorigin" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get the x origin of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the x origin value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_yorigin" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get the y origin of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the y origin value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_text" Deprecated="false" ReturnType="String" Pure="true">
+			<Description>This function can be used to get the text string of the text element. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the text string displayed by the element.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_halign" Deprecated="false" ReturnType="Constant.TextAlign" Pure="true">
+			<Description>This function can be used to get the horizontal alignment of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the horizontal alignment value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_valign" Deprecated="false" ReturnType="Constant.TextAlign" Pure="true">
+			<Description>This function can be used to get the vertical alignment of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the vertical alignment value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_charspacing" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get the character spacing of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the character spacing value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_linespacing" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get the line spacing of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the line spacing value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_framew" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get the width of the frame of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the frame width value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_frameh" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get the height of the frame of the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the frame height value.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
+		<Function Name="layer_text_get_wrap" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to get whether wrapping is enabled for the text element in the room. You give the text element ID (which you get when you create a text element using layer_text_create() or when you use the function layer_text_get_id()), and the function will return the wrapping status.</Description>
+			<Parameter Name="text_element_id" Type="Id.TextElement" Optional="false">The unique ID value of the text element to get the information from</Parameter>
+		</Function>
 		<Function Name="layer_tilemap_create" Deprecated="false" ReturnType="Id.TileMapElement" Pure="false">
 			<Description>With this function you can assign a tile-set resource to a layer to be used as a tile map in your project. You supply the layer ID (which you get when you create the layer using layer_create()) or the layer name (as a string - this will have a performance impact) and then an initial (x, y) position to add the tile map to the room, the tile set resource to use, and then the width and height of the tile map in cells (ie: a width of 20 and a height of 10 will create a tile map with 200 cells that is 20 cells wide and 10 cells tall), with the size of the cells themselves being defined by the tile set chosen. It is worth noting that you cannot place tiles at negative positions within the tile map, so all tiles must be placed within the cell spaces 0 to width - 1, 0 to height - 1.</Description>
 			<Parameter Name="layer_id" Type="String,Id.Layer" Optional="false">The unique ID value of the layer to target (or the layer name as a string)</Parameter>
@@ -2045,7 +2233,7 @@
 			<Description>This function will clear the specified animation track of all animations, ready to be re-assigned.</Description>
 			<Parameter Name="track" Type="Real" Optional="false">The animation track to clear.</Parameter>
 			<Parameter Name="reset" Type="Bool" Optional="true">Whether to reset the skeleton to setup pose (defaults to false).</Parameter>
-			<Parameter Name="track" Type="Real" Optional="true">How long animating the skeleton back to setup pose will take.</Parameter>
+			<Parameter Name="duration" Type="Real" Optional="true">How long animating the skeleton back to setup pose will take.</Parameter>
 		</Function>
 		<Function Name="skeleton_animation_get" Deprecated="false" ReturnType="String" Pure="true">
 			<Description>With this function you can get the current animation set being used by your skeletal animation sprite. The return value is a string, which will be the name of the set as you defined it in your skeletal animation program.</Description>
@@ -2451,7 +2639,7 @@
 			<Parameter Name="xorig" Type="Real" Optional="false">Indicates the x position of the origin in the sprite.</Parameter>
 			<Parameter Name="yorig" Type="Real" Optional="false">Indicates the y position of the origin in the sprite.</Parameter>
 		</Function>
-		<Function Name="sprite_delete" Deprecated="false" ReturnType="Undefined" Pure="false">
+		<Function Name="sprite_delete" Deprecated="false" ReturnType="Bool" Pure="false">
 			<Description>This function will delete a sprite from the game, freeing any memory that was reserved for it. This is a very important function for those moments when you need to create and change sprites from external sources (like loading a sprite from a file with sprite_add(), or duplicating a sprite using sprite_duplicate()) and should always be used to remove those assets that are no longer needed by a game, or to clear an indexed asset from a variable before re-assigning another asset to that variable. This cannot be used to delete sprites that are included in the game as part of the assets in the Asset Browser.</Description>
 			<Parameter Name="index" Type="Asset.GMSprite" Optional="false">The index of the sprite to be deleted.</Parameter>
 		</Function>
@@ -2893,6 +3081,12 @@
 			<Parameter Name="surface" Type="Id.Surface" Optional="false">The index of the surface to use.</Parameter>
 			<Parameter Name="offset" Type="Real" Optional="false">The data offset value (in bytes).</Parameter>
 		</Function>
+		<Function Name="buffer_get_surface_depth" Deprecated="false" ReturnType="Bool" Pure="false">
+			<Description>With this function you can write information from a surface's depth buffer to a given buffer. The buffer must have been created previously and should be a 1-byte aligned buffer large enough to store data for the surface you are going to write (if unsure, use a grow buffer or see the example at the bottom of this page).</Description>
+			<Parameter Name="buffer" Type="Id.Buffer" Optional="false">The index of the buffer to use.</Parameter>
+			<Parameter Name="surface" Type="Id.Surface" Optional="false">The index of the surface whose depth buffer to use.</Parameter>
+			<Parameter Name="offset" Type="Real" Optional="false">The data offset value (in bytes).</Parameter>
+		</Function>
 		<Function Name="buffer_get_type" Deprecated="false" ReturnType="Constant.BufferType" Pure="true">
 			<Description>With this function you retrieve the type of buffer that is being referenced by a buffer ID value. The return value will be one of the following constants:</Description>
 			<Parameter Name="buffer" Type="Id.Buffer" Optional="false">The index of the buffer to check.</Parameter>
@@ -2980,6 +3174,12 @@
 			<Description>With this function you can write information from a buffer to a given surface. Both the buffer being read from and the surface being written to must have been created previously, and you can provide an offset into the buffer to start reading from. Note that reading will always start at the beginning of the buffer plus the offset value and not at the current seek position plus the offset value.</Description>
 			<Parameter Name="buffer" Type="Id.Buffer" Optional="false">The index of the buffer to use.</Parameter>
 			<Parameter Name="surface" Type="Id.Surface" Optional="false">The index of the surface to use.</Parameter>
+			<Parameter Name="offset" Type="Real" Optional="false">The data offset value.</Parameter>
+		</Function>
+		<Function Name="buffer_set_surface_depth" Deprecated="false" ReturnType="Bool" Pure="false">
+			<Description>With this function you can write information from a buffer to a depth buffer of a given surface. Both the buffer being read from and the surface being written to must have been created previously, and you can provide an offset into the buffer to start reading from. Note that reading will always start at the beginning of the buffer plus the offset value and not at the current seek position plus the offset value.</Description>
+			<Parameter Name="buffer" Type="Id.Buffer" Optional="false">The index of the buffer to use.</Parameter>
+			<Parameter Name="surface" Type="Id.Surface" Optional="false">The index of the surface whose depth buffer to use.</Parameter>
 			<Parameter Name="offset" Type="Real" Optional="false">The data offset value.</Parameter>
 		</Function>
 		<Function Name="buffer_set_used_size" Deprecated="false" ReturnType="Undefined" Pure="false">
@@ -4261,17 +4461,19 @@
 		</Function>
 		<Function Name="dbg_slider" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>Creates a slider for a real value within the current debug section, minimum and maximum values can be specified. NOTE: if no section is declared a "Default" section will be created.</Description>
-			<Parameter Name="dbgref" Type="Id.DbgRef" Optional="false">reference to the variable to change</Parameter>
+			<Parameter Name="dbgref" Type="Id.DbgRef|Array[Id.DbgRef]" Optional="false">reference to the variable to change or array of references to variables</Parameter>
 			<Parameter Name="minimum" Type="Real" Optional="true">minimum value</Parameter>
 			<Parameter Name="maximum" Type="Real" Optional="true">maximum value</Parameter>
 			<Parameter Name="label" Type="String" Optional="true">label to use.</Parameter>
+			<Parameter Name="step" Type="Real" Optional="true">step value (numbers &lt;=0 indicate no step).</Parameter>
 		</Function>
 		<Function Name="dbg_slider_int" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>Creates a slider for an integer value within the current debug section, minimum and maximum values can be specified. NOTE: if no section is declared a "Default" section will be created.</Description>
-			<Parameter Name="dbgref" Type="Id.DbgRef" Optional="false">reference to the variable to change</Parameter>
+			<Parameter Name="dbgref" Type="Id.DbgRef|Array[Id.DbgRef]" Optional="false">reference to the variable to change or array of references to variables</Parameter>
 			<Parameter Name="minimum" Type="Real" Optional="true">minimum value</Parameter>
 			<Parameter Name="maximum" Type="Real" Optional="true">maximum value</Parameter>
 			<Parameter Name="label" Type="String" Optional="true">label to use.</Parameter>
+			<Parameter Name="step" Type="Real" Optional="true">step value (numbers &lt;=0 indicate no step).</Parameter>
 		</Function>
 		<Function Name="dbg_add_font_glyphs" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>Adds TTF font to be used in the debug rendering, font should be added to the included files, size of the font can be specified in pixels, and a font range can be selected (glyphs must be present in the given TTF font) * -1 - Default Latin range, * 0 - Greek, * 1 - Korean, * 2 - Japanese, * 3 - Chinese Full, * 4 - Chinese Simplified Common, * 5 - Cyrillic, * 6 - Thai, * 7 - Vietnamese</Description>
@@ -4281,47 +4483,51 @@
 		</Function>
 		<Function Name="dbg_drop_down" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>Creates a drop down for a value within the current debug section, Either use an array of values (with an optional array of labels for those names) OR the values and names are declared as a comma delimited string - where integer values can be specified after a colon symbol so &quot;Zero,One:10,Two:20&quot; will create a 3 entry drop down that will set the variable to the value 0, 10 or 20 depending on which is selected. NOTE: if no section is declared a "Default" section will be created.</Description>
-			<Parameter Name="dbgref" Type="Id.DbgRef" Optional="false">reference to the variable to change</Parameter> 
+			<Parameter Name="dbgref" Type="Id.DbgRef|Array[Id.DbgRef]" Optional="false">reference to the variable to change or array of references to variables</Parameter> 
 			<Parameter Name="specifierOrArrayOfValues" Type="String|Array[String]" Optional="false">dropdown specifier or array of values</Parameter>
 			<Parameter Name="labelOrArrayOfLabels" Type="String|Array[String]" Optional="true">label to use or aarray of Labels</Parameter>
 			<Parameter Name="label" Type="String" Optional="true">label to use.</Parameter>
 		</Function>
 		<Function Name="dbg_watch" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>Creates a watch for any value within the current debug section, each value is converted to a string and displayed. NOTE: if no section is declared a "Default" section will be created.</Description>
-			<Parameter Name="dbgref" Type="Id.DbgRef" Optional="false">reference to the variable to change</Parameter>
+			<Parameter Name="dbgref" Type="Id.DbgRef|Array[Id.DbgRef]" Optional="false">reference to the variable to change or array of references to variables</Parameter>
 			<Parameter Name="label" Type="String" Optional="true">label to use.</Parameter>
 		</Function>
 		<Function Name="dbg_text" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>Creates a text entry (from a variable) within the current debug section, this text can be multiline and is not split into 2 columns but shown in a single column. NOTE: if no section is declared a "Default" section will be created.</Description>
-			<Parameter Name="dbgref" Type="Id.DbgRef,String" Optional="false">reference to the variable to change or a string to show</Parameter>
+			<Parameter Name="dbgref" Type="Id.DbgRef|Array[Id.DbgRef],String" Optional="false">reference to the variable to change or array of references to variables, or a string to show</Parameter>
+		</Function>
+		<Function Name="dbg_text_separator" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>Creates a text separator entry (from a variable) within the current debug section, this text can be multiline and is not split into 2 columns but shown in a single column. NOTE: if no section is declared a "Default" section will be created.</Description>
+			<Parameter Name="dbgref" Type="Id.DbgRef|Array[Id.DbgRef],String" Optional="false">reference to the variable to change or array of references to variables or a string to show</Parameter>
 		</Function>
 		<Function Name="dbg_sprite" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>Creates a sprite view of the specified sprite with the specified index within the current debug section. NOTE: if no section is declared a "Default" section will be created.</Description>
-			<Parameter Name="dbgrefSprite" Type="Id.DbgRef" Optional="false">reference to the variable for the sprite index</Parameter>
-			<Parameter Name="dbgrefSpriteIndex" Type="Id.DbgRef" Optional="false">reference to the variable for the image index</Parameter>
+			<Parameter Name="dbgrefSprite" Type="Id.DbgRef|Array[Id.DbgRef]" Optional="false">reference to the variable for the sprite index or array of references to variables</Parameter>
+			<Parameter Name="dbgrefSpriteIndex" Type="Id.DbgRef|Array[Id.DbgRef]" Optional="false">reference to the variable for the image index or array of references to variables</Parameter>
 			<Parameter Name="label" Type="String" Optional="true">label to use.</Parameter>
 			<Parameter Name="width" Type="Real" Optional="true">width to draw the sprite at, if no height given then maintains the correct ratio for the sprite, default is width of the sprite</Parameter>
 			<Parameter Name="height" Type="Real" Optional="true">height draw the sprite at, default is height of the sprite (or uses a given width to maintain correct ratio of width to height)</Parameter>
 		</Function>
 		<Function Name="dbg_text_input" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>Creates a text input entry within the current debug section. NOTE: if no section is declared a "Default" section will be created.</Description>
-			<Parameter Name="dbgref" Type="Id.DbgRef" Optional="false">reference to the variable to change</Parameter>
+			<Parameter Name="dbgref" Type="Id.DbgRef|Array[Id.DbgRef]" Optional="false">reference to the variable to change or array of references to variables</Parameter>
 			<Parameter Name="label" Type="String" Optional="true">label to use.</Parameter>
 			<Parameter Name="type" Type="String" Optional="true">type to store value as, default is string, use "s" or "t" for string, use "i" or "d" for integer, use "f", "r" or "g" for real</Parameter>
 		</Function>
 		<Function Name="dbg_checkbox" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>Creates a check box entry within the current debug section, variable will be a boolean value true or false. NOTE: if no section is declared a "Default" section will be created.</Description>
-			<Parameter Name="dbgref" Type="Id.DbgRef" Optional="false">reference to the variable to change</Parameter>
+			<Parameter Name="dbgref" Type="Id.DbgRef|Array[Id.DbgRef]" Optional="false">reference to the variable to change or array of references to variables</Parameter>
 			<Parameter Name="label" Type="String" Optional="true">label to use.</Parameter>
 		</Function>
 		<Function Name="dbg_colour" Deprecated="false" ReturnType="Undefined" Locale="GB" Pure="false">
 			<Description>Creates a colour entry within the current debug section, variable will be a colour RGB value, no alpha. NOTE: if no section is declared a "Default" section will be created.</Description>
-			<Parameter Name="dbgref" Type="Id.DbgRef" Optional="false">reference to the variable to change</Parameter>
+			<Parameter Name="dbgref" Type="Id.DbgRef|Array[Id.DbgRef]" Optional="false">reference to the variable to change or array of references to variables</Parameter>
 			<Parameter Name="label" Type="String" Optional="true">label to use.</Parameter>
 		</Function>
 		<Function Name="dbg_color" Deprecated="false" ReturnType="Undefined" Locale="US" Pure="false">
 			<Description>Creates a color entry within the current debug section, variable will be a color RGB value, no alpha. NOTE: if no section is declared a "Default" section will be created.</Description>
-			<Parameter Name="dbgref" Type="Id.DbgRef" Optional="false">reference to the variable to change</Parameter>
+			<Parameter Name="dbgref" Type="Id.DbgRef|Array[Id.DbgRef]" Optional="false">reference to the variable to change or array of references to variables</Parameter>
 			<Parameter Name="label" Type="String" Optional="true">label to use.</Parameter>
 		</Function>
 		<Function Name="dbg_button" Deprecated="false" ReturnType="Undefined" Pure="false">
@@ -4596,6 +4802,21 @@
 			<Parameter Name="col" Type="Constant.Color" Optional="false">The colour with which the screen will be cleared</Parameter>
 			<Parameter Name="alpha" Type="Constant.Color" Optional="false">The transparency of the colour with which the screen will be cleared</Parameter>
 		</Function>
+		<Function Name="draw_clear_depth" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function can be used to clear the depth buffer of the current render target.</Description>
+			<Parameter Name="depth" Type="Real" Optional="false">The value to clear the depth buffer with.</Parameter>
+		</Function>
+		<Function Name="draw_clear_ext" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function can be used to clear colour, depth and stencil of the current render target.</Description>
+			<Parameter Name="col" Type="Constant.Color,Undefined" Optional="true">The colour to clear the current render target with. If undefined, then colour is not cleared. Must be specified if the argument alpha is not undefined.</Parameter>
+			<Parameter Name="alpha" Type="Real,Undefined" Optional="true">The alpha value to clear the current render target with. If undefined, then colour is not cleared. Must be specified if the argument col is not undefined.</Parameter>
+			<Parameter Name="depth" Type="Real,Undefined" Optional="true">The value to clear the depth buffer with. If undefined, then depth is not cleared.</Parameter>
+			<Parameter Name="stencil" Type="Real,Undefined" Optional="true">The value to clear the stencil buffer with. If undeifned, then stencil is not cleared.</Parameter>
+		</Function>
+		<Function Name="draw_clear_stencil" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function can be used to clear the stencil buffer of the current render target.</Description>
+			<Parameter Name="stencil" Type="Real" Optional="false">The value to clear the stencil buffer with.</Parameter>
+		</Function>
 		<Function Name="draw_getpixel" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>With this function you can get the colour value of any pixel that is being drawn to the current render target. This means that the results will depend on the event in which the function is called, and also on the target surface being used. Note that this will not return any alpha values, for that you should use draw_getpixel_ext().</Description>
 			<Parameter Name="x" Type="Real" Optional="false">The x coordinate of the pixel to check</Parameter>
@@ -4637,6 +4858,9 @@
 			<Parameter Name="col1" Type="Constant.Color" Optional="false">The first colour to merge</Parameter>
 			<Parameter Name="col2" Type="Constant.Color" Optional="false">The second colour to merge</Parameter>
 			<Parameter Name="amount" Type="Real" Optional="false">How much of each colour should be merged. For example, 0 will return col1, 1 will return col2, and 0.5 would return a merge of both colours equally</Parameter>
+		</Function>
+		<Function Name="gpu_get_sprite_cull" Deprecated="false" ReturnType="Bool" Pure="true">
+			<Description>With this function you can check to see whether sprite culling is enabled (returns true) or not (returns false). For more information on sprite culling, see the function gpu_set_sprite_culling().</Description>
 		</Function>
 		<Function Name="gpu_get_alphatestenable" Deprecated="false" ReturnType="Bool" Pure="true">
 			<Description>With this function you can check to see whether alpha testing is enabled (returns true) or not (returns false). For more information on alpha testing, see the function gpu_set_alphatestref().</Description>
@@ -4686,6 +4910,30 @@
 		<Function Name="gpu_get_state" Deprecated="false" ReturnType="Id.DsMap" Pure="true">
 			<Description>This function will get the current GPU state, returning it as a DS Map. This can then be manipulated or even saved, and you can return this map to the GPU using the function gpu_set_state().</Description>
 		</Function>
+		<Function Name="gpu_get_stencil_depth_fail" Deprecated="false" ReturnType="Constant.StencilOp" Pure="true">
+			<Description>This function can be used to retrieve the stencil operation executed when the stencil test passes but the depth test fails.</Description>
+		</Function>
+		<Function Name="gpu_get_stencil_enable" Deprecated="false" ReturnType="Bool" Pure="true">
+			<Description>This function can be used to retreive whether the stencil test is currently enabled (returns true) or not (returns false).</Description>
+		</Function>
+		<Function Name="gpu_get_stencil_fail" Deprecated="false" ReturnType="Constant.StencilOp" Pure="true">
+			<Description>This function can be used to retrieve the stencil operation executed when the stencil test fails.</Description>
+		</Function>
+		<Function Name="gpu_get_stencil_func" Deprecated="false" ReturnType="Constant.ZFunction" Pure="true">
+			<Description>This function can be used to retrieve the current stencil test function.</Description>
+		</Function>
+		<Function Name="gpu_get_stencil_pass" Deprecated="false" ReturnType="Constant.StencilOp" Pure="true">
+			<Description>This function can be used to retrieve the stencil operation executed when both stencil and depth test pass.</Description>
+		</Function>
+		<Function Name="gpu_get_stencil_read_mask" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to retrieve the current stencil test read mask value.</Description>
+		</Function>
+		<Function Name="gpu_get_stencil_ref" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to retrieve the current stencil test reference value.</Description>
+		</Function>
+		<Function Name="gpu_get_stencil_write_mask" Deprecated="false" ReturnType="Real" Pure="true">
+			<Description>This function can be used to retrieve the current stencil test write mask value.</Description>
+		</Function>
 		<Function Name="gpu_get_texfilter" Deprecated="false" ReturnType="Bool" Pure="true">
 			<Description>With this function you can check to see whether texture filtering (linear interpolation) is enabled (returns true) or not (returns false). For more information on texture filtering, see the function gpu_set_texfilter().</Description>
 		</Function>
@@ -4717,6 +4965,10 @@
 		</Function>
 		<Function Name="gpu_push_state" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can push the current GPU state onto a stack to be used later. You would generally use this if you want to &quot;save&quot; the current GPU state (things like blend mode, alpha writing, culling, etc... will all be pushed to the stack), then draw something with different settings, and then reset the GPU stack to what it was before (by calling gpu_pop_state()).</Description>
+		</Function>
+		<Function Name="gpu_set_sprite_cull" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function will enable or disable sprite culling for your game (by default this is enabled). By switching sprite culling off you can avoid any problems with for example sprites not being drawn when using custom shaders that alter the position the sprite is drawn at</Description>
+			<Parameter Name="enable" Type="Bool" Optional="false">Enable or disable sprite culling (true / false)</Parameter>
 		</Function>
 		<Function Name="gpu_set_alphatestenable" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function will enable or disable alpha testing for your game (by default this is disabled). By switching alpha testing on you can then use the companion function gpu_set_alphatestref() to set the &quot;cut-off&quot; value at which all alpha values will be set to 0. The image below shows the difference that can be seen when alpha testing is switched on or off:</Description>
@@ -4776,6 +5028,38 @@
 		<Function Name="gpu_set_state" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function will set the current GPU state using the passed-in DS Map. The supplied map can be created using the function gpu_get_state().</Description>
 			<Parameter Name="ds_map" Type="Id.DsMap" Optional="false">The GPU state to set as a DS Map.</Parameter>
+		</Function>
+		<Function Name="gpu_set_stencil_depth_fail" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function can be used to set the stencil operation taken when the stencil test passes but the depth test fails.</Description>
+			<Parameter Name="stencil_op" Type="Constant.StencilOp" Optional="false">The operation executed when the stencil test passes but the depth test fails.</Parameter>
+		</Function>
+		<Function Name="gpu_set_stencil_enable" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function can be used to disable or enable the stencil test.</Description>
+			<Parameter Name="enable" Type="Bool" Optional="false">Enable or disable the stencil test (true or false).</Parameter>
+		</Function>
+		<Function Name="gpu_set_stencil_fail" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function can be used to set the stencil operation taken when the stencil test fails.</Description>
+			<Parameter Name="stencil_op" Type="Constant.StencilOp" Optional="false">The operation executed when the stencil test fails.</Parameter>
+		</Function>
+		<Function Name="gpu_set_stencil_func" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function can be used to set the stencil test function.</Description>
+			<Parameter Name="cmp_func" Type="Constant.ZFunction" Optional="false">The stencil test function.</Parameter>
+		</Function>
+		<Function Name="gpu_set_stencil_pass" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function can be used to set the stencil operation taken when both the stencil and the depth test pass.</Description>
+			<Parameter Name="stencil_op" Type="Constant.StencilOp" Optional="false">The operation executed when both stencil and depth test pass.</Parameter>
+		</Function>
+		<Function Name="gpu_set_stencil_read_mask" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function can be used to set the stencil test read mask.</Description>
+			<Parameter Name="read_mask" Type="Real" Optional="false">A mask that enables or disables reading of individual bits during stencil test.</Parameter>
+		</Function>
+		<Function Name="gpu_set_stencil_ref" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function can be used to set the stencil test reference value.</Description>
+			<Parameter Name="ref" Type="Real" Optional="false">The stencil test reference value in range 0 to 255 (inclusive).</Parameter>
+		</Function>
+		<Function Name="gpu_set_stencil_write_mask" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>This function can be used to set the stencil test write mask.</Description>
+			<Parameter Name="write_mask" Type="Real" Optional="false">A mask that enables or disables writing of individual bits during stencil test</Parameter>
 		</Function>
 		<Function Name="gpu_set_texfilter" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function can be used to set the texture filtering (linear interpolation) of all images drawn on the game screen. When this is enabled (true) all textures will be smoothed when drawn (this includes sprites as they too are considered textures), meaning that when scaled or moved if there is not a 1:1 pixel ratio then there will be a &quot;smudging&quot; across various pixels which may make images appear blurry depending on the art style used. If this is disabled (false) then images will be drawn based on the nearest pixel when scaled or moving which may lead to &quot;blocky&quot; images. The default value is false, and this can also be changed in the Global Game Options for individual target platforms.</Description>
@@ -5952,17 +6236,28 @@
 		<Function Name="surface_get_target" Deprecated="false" ReturnType="Id.Surface" Pure="true">
 			<Description>With this function you can get the ID of the current surface being targeted for drawing to. If you created that surface using surface_create(), then this will be the positive integer which is the unique ID for that surface</Description>
 		</Function>
+		<Function Name="surface_get_target_depth" Deprecated="false" ReturnType="Id.Surface" Pure="true">
+			<Description>This function can be used to retrieve the ID of the surface whose depth buffer is set as the current one.</Description>
+		</Function>
 		<Function Name="surface_get_target_ext" Deprecated="false" ReturnType="Id.Surface" Pure="true">
 			<Description>This function will retrieve the surface ID assigned to one of the 4 render targets available to surfaces. You supply the index of the render target to check, and the function will return -1 if no surface is assigned, or an integer value &gt;= 0, representing the ID of the surface assigned (as returned by the function surface_create()).</Description>
 			<Parameter Name="index" Type="Real" Optional="false">The render target index to check (from 0 to 3).</Parameter>
 		</Function>
 		<Function Name="surface_get_texture" Deprecated="false" ReturnType="Pointer.Texture" Pure="true">
 			<Description>This function returns a special pointer for the surface texture. This value can then be used in other draw functions, particularly in general 3D and some of the 2D primitive functions.</Description>
-			<Parameter Name="surface_id" Type="Id.Surface" Optional="false">The ID of the surface to get the width of.</Parameter>
+			<Parameter Name="surface_id" Type="Id.Surface" Optional="false">The ID of the surface to get the texture of.</Parameter>
+		</Function>
+		<Function Name="surface_get_texture_depth" Deprecated="false" ReturnType="Pointer.Texture" Pure="true">
+			<Description>This function returns a special pointer for the depth buffer texture of a surface. This value can then be used in other draw functions, particularly in general 3D and some of the 2D primitive functions.</Description>
+			<Parameter Name="surface_id" Type="Id.Surface" Optional="false">The ID of the surface to get the depth buffer texture of.</Parameter>
 		</Function>
 		<Function Name="surface_get_width" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>This function simply returns the width, in pixels, of the indexed surface. It should be noted that if you call this to check the application_surface immediately after having changed its size using surface_resize() it will not return the new value as the change needs a step or two to be fully processed. After waiting a step it should return the new size correctly.</Description>
 			<Parameter Name="surface_id" Type="Id.Surface" Optional="false">The ID of the surface to get the width of.</Parameter>
+		</Function>
+		<Function Name="surface_has_depth" Deprecated="false" ReturnType="Bool" Pure="true">
+			<Description>This function returns whether given surface has a depth buffer (returns true) or not (returns false). By default all surfaces have a depth buffer unless depth buffers are disabled using function surface_depth_disable().</Description>
+			<Parameter Name="surface_id" Type="Id.Surface" Optional="false">The ID of the surface to check.</Parameter>
 		</Function>
 		<Function Name="surface_reset_target" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you reset all further drawing from the target surface back to the screen. Please note that to start drawing to a surface you must first have called the function surface_set_target() and then this one after you have finished, for each surface target that you have set or else nothing will be drawn on the screen as all further drawing (even in other instances) will be done on the surface. You should also realise that nothing will be seen if the surface itself is not drawn on the screen in the draw event of an instance.</Description>
@@ -5988,8 +6283,9 @@
 			<Parameter Name="height" Type="Real" Optional="false">The height of the part to save.</Parameter>
 		</Function>
 		<Function Name="surface_set_target" Deprecated="false" ReturnType="Bool" Pure="false">
-			<Description>With this function you set all further drawing to the target surface rather than the screen and in this way you can tell GameMaker to only draw specific things to the specified surface. Please note that if you do not call surface_reset_target() after you have finished, nothing will be drawn on the screen as all further drawing (even in other instances) will be done on the surface. You should also realise that nothing will be seen if the surface itself is not drawn on the screen in the draw event of an instance. You can check the return value of this function too as a debug tool to check whether the surface target was set or not, with a return value of 0 being a failure to set the target and any other positive value being a success.</Description>
+			<Description>With this function you set all further drawing to the target surface rather than the screen and in this way you can tell GameMaker to only draw specific things to the specified surface. Please note that if you do not call surface_reset_target() after you have finished, nothing will be drawn on the screen as all further drawing (even in other instances) will be done on the surface. You should also realise that nothing will be seen if the surface itself is not drawn on the screen in the draw event of an instance. You can check the return value of this function too as a debug tool to check whether the surface target was set or not, with a return value of 0 being a failure to set the target and any other positive value being a success. Optionally you can provide a surface whose depth buffer to use as the current depth buffer (defaults to the surface's depth buffer if not specified).</Description>
 			<Parameter Name="surface_id" Type="Id.Surface" Optional="false">The ID of the surface to set as the drawing target.</Parameter>
+			<Parameter Name="depth_id" Type="Id.Surface" Optional="true">The ID of the surface whose depth buffer to use as the current depth buffer.</Parameter>
 		</Function>
 		<Function Name="surface_set_target_ext" Deprecated="false" ReturnType="Bool" Pure="false">
 			<Description>This function is for use with the Shader Functions and sets the MRT (0 - 3) for native level shaders (DX9, DX11, OpenGL).</Description>
@@ -6901,7 +7197,7 @@
 		</Function>
 		<Function Name="game_end" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can end the game (and the Game End Event will be triggered). This will not happen instantaneously, but rather at the end of the current step, so any code you have in the same step after this function has been called will still run. Please note that this function has the following restrictions:</Description>
-			<Parameter Name="return_code" Type="Real" Optional="true">The return code of the application, will defaul to 0.</Parameter>
+			<Parameter Name="return_code" Type="Real" Optional="true">The return code of the application, will default to 0.</Parameter>
 		</Function>
 		<Function Name="game_get_speed" Deprecated="false" ReturnType="Real" Pure="true">
 			<Description>This function can be used to get the game speed as either the number of game frames to run per second or as the number of micro seconds per game frame. Note that this is not the actual running speed FPS value (for that use the fps_real variable) but rather the number of game frames (FPS) that the game will attempt to maintain each second, or the length of each game frame in microseconds that the game will try to maintain (MPF). When you use this function you need to give one of the following constants which will determine the type of the return value:</Description>
@@ -8122,6 +8418,16 @@
 			<Description>This function is used to change the resolution of the Windows thread scheduler. The resolution value supplied in the argument needs to be in milliseconds.</Description>
 			<Parameter Name="milliseconds" Type="Real" Optional="false">The new resolution value (in milliseconds) or -1 for default</Parameter>
 		</Function>
+		<Function Name="physics_raycast" Deprecated="false" ReturnType="Array" Pure="false">
+			<Description>This function checks the physics fixtures of the objects given against the ray specified, it will return an array of structures that will give the hitPointX, hitPointY (the room coordinates of the intersection), normalX, normalY (the normal of the intersection), fraction (the normalised distance down the ray of the intersection) </Description>
+			<Parameter Name="xStart" Type="Real" Optional="false">x position of the start of the ray.</Parameter>
+			<Parameter Name="yStart" Type="Real" Optional="false">y position of the start of the ray.</Parameter>
+			<Parameter Name="xEnd" Type="Real" Optional="false">x position of the start of the ray.</Parameter>
+			<Parameter Name="yEnd" Type="Real" Optional="false">y position of the start of the ray.</Parameter>
+			<Parameter Name="ids" Type="Asset.GMObject|Id.Instance|Array[Id.Instance]|Array[Asset.GMObject]" Optional="false">instance or object id (or an array of instance or object ids) to check the ray against, these should have physics fixtures</Parameter>
+			<Parameter Name="all_hits" Type="Bool" Optional="true">set to true if you want all hits returned, false if you want the closest hit only - defaults to false</Parameter>
+			<Parameter Name="max_fraction" Type="Real" Optional="true">proportion of the ray to check, defaults to 1.0, can be set to be smaller or larger</Parameter>
+		</Function>
 		<Function Name="physics_mass_properties" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>This function can be used to set custom mass and inertia values for a physics enabled instance. Normally the mass, center of mass, and inertia for an instance is calculated using a combination the surface area of the bound fixtures and their density. However in very special occasions you may need to offset the center of mass or change the inertia and that is when you would use this function. Bear in mind that the mass is calculated in real world weight (ie:kilograms) and you should always try and keep values realistic for what you are modelling. So if your physics object is meant to represent a person, their mass would be approximately 70 kilos.</Description>
 			<Parameter Name="mass" Type="Real" Optional="false">The new mass that you want the fixture to have.</Parameter>
@@ -8526,7 +8832,7 @@
 			<Parameter Name="xv" Type="Real" Optional="false">The initial horizontal velocity.</Parameter>
 			<Parameter Name="yv" Type="Real" Optional="false">The initial vertical velocity.</Parameter>
 			<Parameter Name="ang_velocity" Type="Real" Optional="false">The initial angular velocity.</Parameter>
-			<Parameter Name="col" Type="Bool" Optional="false">The base colour to use for the particle group.</Parameter>
+			<Parameter Name="col" Type="Constant.Color" Optional="false">The base colour to use for the particle group.</Parameter>
 			<Parameter Name="alpha" Type="Real" Optional="false">The base alpha to use for the particle group.</Parameter>
 			<Parameter Name="strength" Type="Real" Optional="false">Set the cohesion strength between particles in the group.</Parameter>
 			<Parameter Name="category" Type="Real" Optional="false">The user defined category to which the group belongs.</Parameter>
@@ -9327,7 +9633,12 @@
 		<Function Name="struct_exists" Deprecated="false" ReturnType="Bool" Pure="true">
 			<Description>With this function you can check whether a variable exists within the given struct or not. You supply the struct reference to use as well as the variable name to check for as a string (see example code below). The function will return true if a variable with the given name exists for the struct and false otherwise.</Description>
 			<Parameter Name="struct" Type="Struct" Optional="false">The struct reference to check</Parameter>
-			<Parameter Name="name" Type="Any" Optional="false">The name of the struct variable to check for (as a string)</Parameter>
+			<Parameter Name="name" Type="String" Optional="false">The name of the struct variable to check for (as a string)</Parameter>
+		</Function>
+		<Function Name="struct_exists_from_hash" Deprecated="false" ReturnType="Bool" Pure="true">
+			<Description>With this function you can check whether a variable exists within the given struct or not. . The function will return true if a variable with the given hash exists for the struct and false otherwise.</Description>
+			<Parameter Name="struct" Type="Struct" Optional="false">The struct reference to check</Parameter>
+			<Parameter Name="hash" Type="Real" Optional="false">The hash of the struct variable to check for</Parameter>
 		</Function>
 		<Function Name="struct_foreach" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can execute a method on all of the members in the struct.</Description>
@@ -9337,12 +9648,12 @@
 		<Function Name="struct_get" Deprecated="false" ReturnType="Any" Pure="true">
 			<Description>With this function you can get the value from a given named variable within a struct. You supply the struct reference as well as the name of the variable to get the value of as a string (see example code below). The function will return the value held by the variable or undefined if the named variable does not exist.</Description>
 			<Parameter Name="struct" Type="Struct" Optional="false">The struct reference to use</Parameter>
-			<Parameter Name="name" Type="Any" Optional="false">The name of the variable to get (as a string)</Parameter>
+			<Parameter Name="name" Type="String" Optional="false">The name of the variable to get</Parameter>
 		</Function>
 		<Function Name="struct_get_from_hash" Deprecated="false" ReturnType="Any" Pure="true">
 			<Description>With this function you can get the value from a given named variable within a struct. You supply the struct reference as well as the hash of the variable to get the value of (returned from 'variable_get_hash'). The function will return the value held by the variable or undefined if the named variable does not exist.</Description>
 			<Parameter Name="struct" Type="Struct" Optional="false">The struct reference to use</Parameter>
-			<Parameter Name="hash" Type="Real" Optional="false">The hash of the variable to get (returned from 'variable_get_hash')</Parameter>
+			<Parameter Name="hash" Type="Real" Optional="false">The hash of the variable being accessed (returned from 'variable_get_hash')</Parameter>
 		</Function>
 		<Function Name="struct_get_names" Deprecated="false" ReturnType="Array[String]" Pure="true">
 			<Description>With this function you can retrieve an array populated with the variable names from a struct. You pass in the struct reference to check, and each entry in the array will be a string of the variable names that the struct contains.</Description>
@@ -9355,18 +9666,23 @@
 		<Function Name="struct_remove" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can remove a variable from a struct. You supply the struct ID to remove the variable from and the string name of the variable to be removed.</Description>
 			<Parameter Name="struct" Type="Struct" Optional="false">The struct reference to remove the variable from</Parameter>
-			<Parameter Name="name" Type="Any" Optional="false">The name of the variable to remove (as a string)</Parameter>
+			<Parameter Name="name" Type="String" Optional="false">The name of the variable to remove</Parameter>
+		</Function>
+		<Function Name="struct_remove_from_hash" Deprecated="false" ReturnType="Undefined" Pure="false">
+			<Description>With this function you can remove a variable from a struct. You supply the struct ID to remove the variable from and the hash of the variable to be removed.</Description>
+			<Parameter Name="struct" Type="Struct" Optional="false">The struct reference to remove the variable from</Parameter>
+			<Parameter Name="hash" Type="Real" Optional="false">The hash of the variable being removed (returned from 'variable_get_hash')</Parameter>
 		</Function>
 		<Function Name="struct_set" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can set the value of a given variable in a struct. You supply the struct reference as well as the name of the variable to set the value of as a string (see example code below), and then finally the value to set (can be any valid data type). If the variable does not exist already in the struct it will be created and then assigned the value.</Description>
 			<Parameter Name="struct" Type="Struct" Optional="false">The struct reference to set</Parameter>
-			<Parameter Name="name" Type="Any" Optional="false">The name of the variable to set (as a string)</Parameter>
+			<Parameter Name="name" Type="String" Optional="false">The name of the variable to set</Parameter>
 			<Parameter Name="val" Type="Any" Optional="false">The value to set the variable to</Parameter>
 		</Function>
 		<Function Name="struct_set_from_hash" Deprecated="false" ReturnType="Undefined" Pure="false">
 			<Description>With this function you can set the value of a given variable in a struct. You supply the struct reference as well as the hash of the variable to set the value of (returned from 'variable_get_hash'), and then finally the value to set (can be any valid data type). If the variable does not exist already in the struct it will be created and then assigned the value.</Description>
 			<Parameter Name="struct" Type="Struct" Optional="false">The struct reference to set</Parameter>
-			<Parameter Name="hash" Type="Real" Optional="false">The hash of the variable to set (returned from 'variable_get_hash')</Parameter>
+			<Parameter Name="hash" Type="Real" Optional="false">The hash of the variable being set (returned from 'variable_get_hash')</Parameter>
 			<Parameter Name="val" Type="Any" Optional="false">The value to set the variable to</Parameter>
 		</Function>
 		<Function Name="analytics_event" Deprecated="true" ReturnType="Undefined" Pure="false">
@@ -10862,7 +11178,7 @@
 		<Constant Name="audio_falloff_none" Class="AudioFalloff" Type="Real" Deprecated="false"> gain = 1</Constant>
 		<Constant Name="audio_mono" Class="AudioChannelType" Type="Real" Deprecated="false">Mono (single channel) audio.</Constant>
 		<Constant Name="audio_stereo" Class="AudioChannelType" Type="Real" Deprecated="false">Stereo (dual channel) audio.</Constant>
-		<Constant Name="audio_3D" Class="AudioChannelType" Type="Real" Deprecated="false">3D (5.1) audio.</Constant>
+		<Constant Name="audio_3d" Class="AudioChannelType" Type="Real" Deprecated="false">3D (5.1) audio.</Constant>
 		<Constant Name="ev_create" Class="EventType" Type="Real" Deprecated="false">Create event</Constant>
 		<Constant Name="ev_destroy" Class="EventType" Type="Real" Deprecated="false">Destroy event</Constant>
 		<Constant Name="ev_cleanup" Class="EventType" Type="Real" Deprecated="false">Clean Up Event</Constant>
@@ -10973,10 +11289,18 @@
 		<Constant Name="layerelementtype_particlesystem" Class="LayerElementType" Type="Real" Deprecated="false">The element is a particle system.</Constant>
 		<Constant Name="layerelementtype_tile" Class="LayerElementType" Type="Real" Deprecated="false">The element is a legacy background tile (this is only valid for projects that have been imported from previous versions of GameMaker).</Constant>
 		<Constant Name="layerelementtype_sequence" Class="LayerElementType" Type="Real" Deprecated="false">The element is a sequence asset.</Constant>
+		<Constant Name="layerelementtype_text" Class="LayerElementType" Type="Real" Deprecated="false">The element is a text element.</Constant>
 		<Constant Name="tile_rotate" Class="TileMask" Type="Real" Deprecated="false">Used to set/get the rotate bit of a tile data blob.</Constant>
 		<Constant Name="tile_mirror" Class="TileMask" Type="Real" Deprecated="false">Used to set/get the mirror bit of a tile data blob.</Constant>
 		<Constant Name="tile_flip" Class="TileMask" Type="Real" Deprecated="false">Used to set/get the flip bit of a tile data blob.</Constant>
 		<Constant Name="tile_index_mask" Class="TileMask" Type="Real" Deprecated="false">A special constant that is for &quot;and&quot;-ing with the tile data blob to extract the tile index.</Constant>
+		<Constant Name="textalign_left" Class="TextAlign" Type="Real" Deprecated="false">Indicates that text should be aligned to the left of the frame.</Constant>
+		<Constant Name="textalign_right" Class="TextAlign" Type="Real" Deprecated="false">Indicates that text should be aligned to the right of the frame.</Constant>
+		<Constant Name="textalign_center" Class="TextAlign" Type="Real" Deprecated="false">Indicates that text should be centred horizontally within the frame.</Constant>
+		<Constant Name="textalign_justify" Class="TextAlign" Type="Real" Deprecated="false">Indicates that text should be justified within the frame.</Constant>
+		<Constant Name="textalign_top" Class="TextAlign" Type="Real" Deprecated="false">Indicates that text should be aligned to the top of the frame.</Constant>
+		<Constant Name="textalign_bottom" Class="TextAlign" Type="Real" Deprecated="false">Indicates that text should be aligned to the bottom of the frame.</Constant>
+		<Constant Name="textalign_middle" Class="TextAlign" Type="Real" Deprecated="false">Indicates that text should be centered vertically within the frame.</Constant>
 		<Constant Name="seqtracktype_graphic" Class="SequenceTrackType" Type="Real" Deprecated="false">This is a graphics (sprite) asset track.</Constant>
 		<Constant Name="seqtracktype_audio" Class="SequenceTrackType" Type="Real" Deprecated="false">This is an audio asset track.</Constant>
 		<Constant Name="seqtracktype_audioeffect" Class="SequenceTrackType" Type="Real" Deprecated="false">This is an audio effect parameter track.</Constant>
@@ -11041,6 +11365,7 @@
 		<Constant Name="bboxkind_ellipse" Class="CollisionMask" Type="Real" Deprecated="false">An elliptical collision mask shape</Constant>
 		<Constant Name="bboxkind_diamond" Class="CollisionMask" Type="Real" Deprecated="false">A diamond collision mask shape</Constant>
 		<Constant Name="bboxkind_precise" Class="CollisionMask" Type="Real" Deprecated="false">A precise collision mask, where the mask will conform to the non-transparent pixels of the sprite, based on the tolerance value given (see below))</Constant>
+		<Constant Name="bboxkind_spine" Class="CollisionMask" Type="Real" Deprecated="false">Collision mesh from Spine sprite</Constant>
 		<Constant Name="buffer_fixed" Class="BufferType" Type="Real" Deprecated="false">A buffer of fixed size.</Constant>
 		<Constant Name="buffer_grow" Class="BufferType" Type="Real" Deprecated="false">A buffer that will &quot;grow&quot; dynamically as data is added</Constant>
 		<Constant Name="buffer_wrap" Class="BufferType" Type="Real" Deprecated="false">A buffer where the data will &quot;wrap&quot;. When the data being added reaches the limit of the buffer size, the overwrite will be placed back at the start of the buffer, and further writing will continue from that point.</Constant>
@@ -11553,6 +11878,14 @@
 		<Constant Name="cmpfunc_notequal" Class="ZFunction" Type="Real" Deprecated="false" />
 		<Constant Name="cmpfunc_greaterequal" Class="ZFunction" Type="Real" Deprecated="false" />
 		<Constant Name="cmpfunc_always" Class="ZFunction" Type="Real" Deprecated="false" />
+		<Constant Name="stencilop_keep" Class="StencilOp" Type="Real" Deprecated="false">Keeps the current value in the stencil buffer.</Constant>
+		<Constant Name="stencilop_zero" Class="StencilOp" Type="Real" Deprecated="false">Sets the stencil buffer value to 0.</Constant>
+		<Constant Name="stencilop_replace" Class="StencilOp" Type="Real" Deprecated="false">Sets the stencil buffer value to the stencil reference value.</Constant>
+		<Constant Name="stencilop_incr_wrap" Class="StencilOp" Type="Real" Deprecated="false">Increments the stencil buffer value, wrapping to 0 at the maximum value.</Constant>
+		<Constant Name="stencilop_decr_wrap" Class="StencilOp" Type="Real" Deprecated="false">Decrements the stencil buffer value, wrapping to the maximum value at 0.</Constant>
+		<Constant Name="stencilop_invert" Class="StencilOp" Type="Real" Deprecated="false">Performs a bitwise inversion on the current stencil buffer value.</Constant>
+		<Constant Name="stencilop_incr" Class="StencilOp" Type="Real" Deprecated="false">Increments the stencil buffer value, clamping at the maximum value.</Constant>
+		<Constant Name="stencilop_decr" Class="StencilOp" Type="Real" Deprecated="false">Decrements the stencil buffer value, clamping at 0.</Constant>
 		<Constant Name="iap_ev_storeload" Type="Real" Deprecated="false" />
 		<Constant Name="iap_ev_product" Type="Real" Deprecated="false" />
 		<Constant Name="iap_ev_purchase" Type="Real" Deprecated="false" />
@@ -11798,6 +12131,9 @@
 			<Field Name="yorigin" Type="Real" Get="true" Set="true" />
 			<Field Name="gain" Type="Real" Get="true" Set="true" />
 			<Field Name="pitch" Type="Real" Get="true" Set="true" />
+			<Field Name="falloffRef" Type="Real" Get="true" Set="true" />
+			<Field Name="falloffMax" Type="Real" Get="true" Set="true" />
+			<Field Name="falloffFactor" Type="Real" Get="true" Set="true" />
 			<Field Name="width" Type="Real" Get="true" Set="true" />
 			<Field Name="height" Type="Real" Get="true" Set="true" />
 			<Field Name="imageindex" Type="Real" Get="true" Set="true" />
